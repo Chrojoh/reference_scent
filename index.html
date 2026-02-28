@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 <title>CKC Scent Detection — Rules Reference</title>
 
 <!-- PWA -->
@@ -36,65 +36,86 @@
     --anise-bg:  #f8ecd8; --anise-b: #aa6a10; --anise-t: #8a4a00;
     --clove-bg:  #f8d8e8; --clove-b: #aa2060; --clove-t: #8a0a40;
   }
-  * { box-sizing: border-box; margin: 0; padding: 0; }
+  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+  html, body { height: 100%; overflow: hidden; }
   body {
     background: var(--bg);
     color: var(--text);
     font-family: 'Crimson Pro', Georgia, serif;
-    min-height: 100vh;
+    display: flex; flex-direction: column;
+    /* fill the whole screen including notch areas */
+    padding-top: env(safe-area-inset-top);
   }
 
   /* ── HEADER ── */
   .header {
     background: #1a1008;
     border-bottom: 3px solid var(--orange);
-    padding: 16px 24px;
-    display: flex; align-items: center; gap: 16px;
+    padding: 12px 16px;
+    padding-left: max(16px, env(safe-area-inset-left));
+    padding-right: max(16px, env(safe-area-inset-right));
+    display: flex; align-items: center; gap: 12px;
+    flex-shrink: 0;
   }
   .header-logo {
-    width: 52px; height: 52px;
+    width: 40px; height: 40px;
     background: var(--orange); border-radius: 50%;
     display: flex; align-items: center; justify-content: center;
-    font-size: 20px; font-weight: 900; color: #fff;
-    font-family: 'Playfair Display', serif; flex-shrink: 0;
-    box-shadow: 0 0 24px #c85f0060;
+    font-size: 18px; flex-shrink: 0;
+    box-shadow: 0 0 16px #c85f0060;
   }
   .header-title {
     font-family: 'Playfair Display', serif;
-    font-size: 22px; font-weight: 900; color: #fff; line-height: 1.1;
+    font-size: 18px; font-weight: 900; color: #fff; line-height: 1.1;
   }
   .header-title span { color: var(--orange); }
   .header-sub {
     font-family: 'Source Code Pro', monospace;
-    font-size: 9px; letter-spacing: 3px; color: #9a8070;
-    text-transform: uppercase; margin-top: 4px;
+    font-size: 8px; letter-spacing: 2px; color: #9a8070;
+    text-transform: uppercase; margin-top: 3px;
   }
-  .header-badge {
-    margin-left: auto; font-family: 'Source Code Pro', monospace;
-    font-size: 9px; color: #7a6858; letter-spacing: 2px; text-align: right; line-height: 2;
-  }
-  .header-badge strong { color: #c89060; }
+  .header-badge { display: none; } /* hidden on mobile */
 
-  /* ── TABS ── */
-  .tabs {
-    display: flex; background: #1a1008;
-    border-bottom: 1px solid #3a2a1a; padding: 0 24px;
+  /* ── SCROLL AREA ── */
+  .scroll-area {
+    flex: 1; overflow-y: auto; overflow-x: hidden;
+    -webkit-overflow-scrolling: touch;
   }
-  .tab {
-    padding: 13px 20px;
-    font-family: 'Source Code Pro', monospace;
-    font-size: 10px; letter-spacing: 2px; text-transform: uppercase; font-weight: 600;
-    color: #7a6858; cursor: pointer; border-bottom: 2px solid transparent; transition: all 0.15s;
-  }
-  .tab:hover { color: #bfa880; }
-  .tab.active { color: var(--orange); border-bottom-color: var(--orange); }
 
   /* ── PAGE LAYOUT ── */
-  .page { display: none; padding: 24px; max-width: 1100px; margin: 0 auto; }
+  .page {
+    display: none;
+    padding: 16px;
+    padding-left: max(16px, env(safe-area-inset-left));
+    padding-right: max(16px, env(safe-area-inset-right));
+  }
   .page.active { display: block; }
 
+  /* ── BOTTOM NAV ── */
+  .bottom-nav {
+    display: flex; background: #1a1008;
+    border-top: 1px solid #3a2a1a;
+    padding-bottom: env(safe-area-inset-bottom);
+    padding-left: env(safe-area-inset-left);
+    padding-right: env(safe-area-inset-right);
+    flex-shrink: 0;
+  }
+  .tab {
+    flex: 1; display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    padding: 10px 4px 8px;
+    font-family: 'Source Code Pro', monospace;
+    font-size: 9px; letter-spacing: 1px; text-transform: uppercase; font-weight: 600;
+    color: #5a4a38; cursor: pointer; transition: all 0.15s;
+    gap: 4px; min-height: 56px; /* large touch target */
+    border: none; background: none;
+  }
+  .tab-icon { font-size: 20px; line-height: 1; }
+  .tab:hover { color: #bfa880; }
+  .tab.active { color: var(--orange); }
+
   /* ── SELECTORS ── */
-  .selector-group { margin-bottom: 14px; }
+  .selector-group { margin-bottom: 12px; }
   .selector-label {
     font-family: 'Source Code Pro', monospace;
     font-size: 9px; letter-spacing: 3px; color: var(--text3);
@@ -102,28 +123,27 @@
   }
   .btn-row { display: flex; gap: 6px; flex-wrap: wrap; }
   .btn {
-    padding: 8px 16px; background: var(--bg3); color: var(--text2);
-    border: 1px solid var(--border); border-radius: 3px; cursor: pointer;
-    font-family: 'Source Code Pro', monospace; font-size: 10px; letter-spacing: 1px; font-weight: 600;
-    transition: all 0.12s;
+    padding: 10px 16px; background: var(--bg3); color: var(--text2);
+    border: 1px solid var(--border); border-radius: 6px; cursor: pointer;
+    font-family: 'Source Code Pro', monospace; font-size: 11px; letter-spacing: 1px; font-weight: 600;
+    transition: all 0.12s; min-height: 44px; /* Apple's minimum touch target */
   }
-  .btn:hover { color: var(--text); border-color: var(--border2); }
+  .btn:active { opacity: 0.7; }
   .btn.active-class { background: var(--orange-bg); color: var(--orange2); border-color: var(--orange); }
   .btn.active-comp  { background: #1a4a7a18; color: #1a4a7a; border-color: #1a4a7a; }
 
   /* ── CARDS ── */
-  .rules-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
-  @media(max-width:700px){ .rules-grid { grid-template-columns: 1fr; } }
-  .card { background: var(--bg2); border: 1px solid var(--border); border-radius: 5px; overflow: hidden; }
+  .rules-grid { display: grid; grid-template-columns: 1fr; gap: 12px; }
+  .card { background: var(--bg2); border: 1px solid var(--border); border-radius: 8px; overflow: hidden; }
   .card.full-width { grid-column: 1 / -1; }
   .card-header {
-    padding: 12px 18px; border-bottom: 1px solid var(--border);
+    padding: 12px 16px; border-bottom: 1px solid var(--border);
     display: flex; justify-content: space-between; align-items: flex-start;
     background: #faf8f5;
   }
-  .card-title { font-family: 'Playfair Display', serif; font-size: 18px; font-weight: 700; }
+  .card-title { font-family: 'Playfair Display', serif; font-size: 17px; font-weight: 700; }
   .card-code  { font-family: 'Source Code Pro', monospace; font-size: 10px; color: var(--text3); margin-top: 3px; font-weight: 600; }
-  .card-body  { padding: 14px 18px; }
+  .card-body  { padding: 12px 16px; }
 
   /* ── RULE ROWS ── */
   .rule-row {
@@ -269,8 +289,7 @@
   }
   .title-req-row:last-child { border-bottom: none; }
   .title-req-label { color: var(--text3); font-weight: 600; min-width: 140px; flex-shrink: 0; }
-  .comp-title-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 14px; margin-top: 20px; }
-  @media(max-width:700px){ .comp-title-grid { grid-template-columns: 1fr; } }
+  .comp-title-grid { display: grid; grid-template-columns: 1fr; gap: 12px; margin-top: 16px; }
 
   /* ── FADE ── */
   @keyframes fadeIn { from { opacity:0; transform:translateY(6px); } to { opacity:1; transform:none; } }
@@ -283,29 +302,20 @@
 <div class="header">
   <div class="header-logo">🐾</div>
   <div>
-    <div class="header-title"><span>Scent Detection</span> Trial</div>
-    <div class="header-sub">Canadian Kennel Club · Rules Reference</div>
-  </div>
-  <div class="header-badge">
-    <div>Rules Effective <strong>January 1, 2024</strong></div>
-    <div>Source: CKC Scent Detection Trial Rules &amp; Regulations</div>
+    <div class="header-title"><span>Scent Detection</span></div>
+    <div class="header-sub">CKC Trial Rules Reference</div>
   </div>
   <button id="install-btn" onclick="installApp()" style="display:none;
-    margin-left:12px; padding:8px 14px;
-    background:var(--orange); color:#fff; border:none; border-radius:4px;
+    margin-left:auto; padding:8px 14px;
+    background:var(--orange); color:#fff; border:none; border-radius:6px;
     font-family:'Source Code Pro',monospace; font-size:10px; letter-spacing:1px;
-    cursor:pointer; flex-shrink:0; font-weight:600;">
-    ⬇ Install App
+    cursor:pointer; flex-shrink:0; font-weight:600; min-height:44px;">
+    ⬇ Install
   </button>
 </div>
 
-<!-- TABS -->
-<div class="tabs">
-  <div class="tab active"  onclick="switchTab('rules')">Rules Reference</div>
-  <div class="tab"         onclick="switchTab('compare')">Quick Compare</div>
-  <div class="tab"         onclick="switchTab('faults')">Faults Guide</div>
-  <div class="tab"         onclick="switchTab('titles')">Titles &amp; Awards</div>
-</div>
+<!-- SCROLLABLE CONTENT -->
+<div class="scroll-area">
 
 <!-- ══════════════════════════════════════════════════════
      PAGE: RULES REFERENCE
@@ -697,7 +707,7 @@
           <div class="card-title">Distraction Rules</div>
         </div>
       </div>
-      <div class="card-body" style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:20px;">
+      <div class="card-body" style="display:grid;grid-template-columns:1fr;gap:16px;">
         <div>
           <div style="font-family:'Source Code Pro',monospace;font-size:10px;font-weight:700;color:var(--orange2);letter-spacing:2px;text-transform:uppercase;margin-bottom:8px;">Toy Distractions</div>
           <div class="special-rule"><span class="special-rule-icon">›</span><span>Must not contain any artificial scent such as another essential oil, perfume, or scented lotion.</span></div>
@@ -965,6 +975,24 @@
 
 </div>
 
+</div><!-- end scroll-area -->
+
+<!-- BOTTOM NAV -->
+<nav class="bottom-nav">
+  <button class="tab active" onclick="switchTab('rules')">
+    <span class="tab-icon">🔍</span>Rules
+  </button>
+  <button class="tab" onclick="switchTab('compare')">
+    <span class="tab-icon">📊</span>Compare
+  </button>
+  <button class="tab" onclick="switchTab('faults')">
+    <span class="tab-icon">⚠️</span>Faults
+  </button>
+  <button class="tab" onclick="switchTab('titles')">
+    <span class="tab-icon">🏆</span>Titles
+  </button>
+</nav>
+
 <script>
 // ═══════════════════════════════════════════════════════════════
 // DATA — all specs confirmed from CKC rulebook
@@ -1224,12 +1252,14 @@ let state = { classKey: 'instinct', comp: 'containers' };
 // TAB SWITCH
 // ═══════════════════════════════════════════════════════════════
 function switchTab(name) {
-  const tabs  = document.querySelectorAll('.tab');
+  const tabs  = document.querySelectorAll('.bottom-nav .tab');
   const pages = ['rules','compare','faults','titles'];
   tabs.forEach((t, i) => t.classList.toggle('active', pages[i] === name));
   pages.forEach(p => {
     document.getElementById('page-' + p).classList.toggle('active', p === name);
   });
+  // scroll back to top when switching tabs
+  document.querySelector('.scroll-area').scrollTop = 0;
 }
 
 // ═══════════════════════════════════════════════════════════════
