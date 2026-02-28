@@ -37,8 +37,10 @@
     --clove-bg:  #f8d8e8; --clove-b: #aa2060; --clove-t: #8a0a40;
   }
   * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
-  html, body { height: 100%; overflow: hidden; }
+  html { height: 100%; overflow: hidden; }
   body {
+    height: 100%; overflow: hidden; overflow-x: hidden;
+    max-width: 100vw;
     background: var(--bg);
     color: var(--text);
     font-family: 'Crimson Pro', Georgia, serif;
@@ -79,15 +81,18 @@
   /* ── SCROLL AREA ── */
   .scroll-area {
     flex: 1; overflow-y: auto; overflow-x: hidden;
+    width: 100%; max-width: 100vw;
     -webkit-overflow-scrolling: touch;
   }
 
   /* ── PAGE LAYOUT ── */
   .page {
     display: none;
+    width: 100%; max-width: 100%;
     padding: 16px;
     padding-left: max(16px, env(safe-area-inset-left));
     padding-right: max(16px, env(safe-area-inset-right));
+    overflow-x: hidden;
   }
   .page.active { display: block; }
 
@@ -218,30 +223,50 @@
   .badge-green  { background: #e8f5e0; border: 1px solid #60a040; color: #1e5c30; }
 
   /* ── COMPARE TABLE ── */
-  .compare-wrap { overflow-x: auto; }
-  .compare-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  .compare-wrap { width: 100%; overflow-x: auto; -webkit-overflow-scrolling: touch; }
+  .compare-table { width: 100%; border-collapse: collapse; font-size: 13px; min-width: 0; }
   .compare-table th, .compare-table td {
-    padding: 9px 12px; border: 1px solid var(--border);
-    text-align: center; vertical-align: middle;
+    padding: 8px 10px; border: 1px solid var(--border);
+    text-align: left; vertical-align: top; word-break: break-word;
   }
   .compare-table thead th {
     background: #1a1008; color: #fff;
     font-family: 'Source Code Pro', monospace;
-    font-size: 10px; letter-spacing: 2px; text-transform: uppercase; font-weight: 600;
+    font-size: 10px; letter-spacing: 1px; text-transform: uppercase; font-weight: 600;
   }
   .compare-table thead th.class-head { background: var(--orange); }
   .compare-table tbody tr:nth-child(even) td { background: #faf8f5; }
   .compare-table tbody td.row-label {
-    background: #f0ede8; text-align: left;
+    background: #f0ede8;
     font-family: 'Source Code Pro', monospace;
-    font-size: 10px; font-weight: 700; letter-spacing: 1px; color: var(--text2); white-space: nowrap;
+    font-size: 10px; font-weight: 700; letter-spacing: 0.5px; color: var(--text2);
   }
   .compare-table tbody td.group-head {
     background: #1a1008; color: var(--orange);
     font-family: 'Source Code Pro', monospace;
-    font-size: 9px; letter-spacing: 3px; text-transform: uppercase;
-    text-align: left; font-weight: 700; padding: 6px 12px;
+    font-size: 9px; letter-spacing: 2px; text-transform: uppercase;
+    font-weight: 700; padding: 6px 10px;
   }
+
+  /* Mobile: 2-col compare (label + one class per card) */
+  .compare-class-cards { display: flex; flex-direction: column; gap: 12px; }
+  .compare-class-card {
+    background: var(--bg2); border: 1px solid var(--border); border-radius: 8px; overflow: hidden;
+  }
+  .compare-class-card-header {
+    padding: 10px 14px; font-family: 'Playfair Display', serif;
+    font-size: 16px; font-weight: 900; color: #fff;
+  }
+  .compare-row {
+    display: flex; flex-direction: column; gap: 2px;
+    padding: 9px 14px; border-bottom: 1px solid var(--border); font-size: 14px;
+  }
+  .compare-row:last-child { border-bottom: none; }
+  .compare-row-label {
+    font-family: 'Source Code Pro', monospace; font-size: 10px; font-weight: 700;
+    color: var(--text3); text-transform: uppercase; letter-spacing: 0.5px;
+  }
+  .compare-row-val { color: var(--text); line-height: 1.4; }
 
   /* ── SECTION HEAD ── */
   .section-head {
@@ -349,243 +374,19 @@
 ══════════════════════════════════════════════════════ -->
 <div id="page-compare" class="page">
 
-  <!-- CONTAINERS -->
-  <div style="margin-bottom:28px;">
-    <div class="section-head" style="margin-bottom:10px;">🐾 9.6 — Container Component</div>
-    <div class="compare-wrap">
-      <table class="compare-table">
-        <thead>
-          <tr>
-            <th style="text-align:left;">Specification</th>
-            <th class="class-head">Instinct</th>
-            <th class="class-head">Novice</th>
-            <th class="class-head">Open</th>
-            <th class="class-head">Excellent</th>
-            <th class="class-head">Master</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr><td class="group-head" colspan="6">Odour</td></tr>
-          <tr>
-            <td class="row-label">Target Scent(s)</td>
-            <td><span class="scent-pill pill-wg">W</span></td>
-            <td><span class="scent-pill pill-wg">W</span></td>
-            <td><span class="scent-pill pill-wg">W</span><br><span class="scent-pill pill-pine">P</span></td>
-            <td><span class="scent-pill pill-wg">W</span><br><span class="scent-pill pill-pine">P</span><br><span class="scent-pill pill-anise">A</span></td>
-            <td><span class="scent-pill pill-wg">W</span><br><span class="scent-pill pill-pine">P</span><br><span class="scent-pill pill-anise">A</span><br><span class="scent-pill pill-clove">CL</span></td>
-          </tr>
-          <tr><td class="group-head" colspan="6">Containers</td></tr>
-          <tr>
-            <td class="row-label"># Containers</td>
-            <td>5</td><td>10</td><td>15</td><td>20</td><td>20</td>
-          </tr>
-          <tr>
-            <td class="row-label">Type</td>
-            <td>Identical boxes</td><td>Identical boxes</td>
-            <td colspan="3">Various size &amp; type</td>
-          </tr>
-          <tr>
-            <td class="row-label">Arrangement</td>
-            <td>1 row of 5</td><td>2 rows of 5</td>
-            <td>3 rows / circle / "U"</td>
-            <td colspan="2">4 rows / circle / "U"</td>
-          </tr>
-          <tr>
-            <td class="row-label">Min. Distance</td>
-            <td>30 cm all directions</td>
-            <td colspan="4">30 cm between containers; 91 cm between rows</td>
-          </tr>
-          <tr><td class="group-head" colspan="6">Hides &amp; Search</td></tr>
-          <tr>
-            <td class="row-label"># Hides</td>
-            <td>1 known</td><td>1 known</td><td>2 known</td><td>3 known</td>
-            <td><strong>1–3 unknown</strong></td>
-          </tr>
-          <tr>
-            <td class="row-label">Time Limit</td>
-            <td>2 min</td><td>2 min</td><td>2 min</td><td>3 min</td><td>3 min</td>
-          </tr>
-          <tr>
-            <td class="row-label">Distractions</td>
-            <td>None</td><td>None</td><td>1 Toy</td>
-            <td>2 (Toy or Food)</td><td>3 (Toy, Food, or Human)</td>
-          </tr>
-          <tr>
-            <td class="row-label">Required Calls</td>
-            <td>Alert</td><td>Alert</td><td>2× Alert</td><td>3× Alert</td>
-            <td>Alert(s) + Finish/Clear</td>
-          </tr>
-          <tr>
-            <td class="row-label">Search Area</td>
-            <td>23–37 m²<br><small>(250–400 ft²)</small></td>
-            <td>23–37 m²<br><small>(250–400 ft²)</small></td>
-            <td>37–56 m²<br><small>(400–600 ft²)</small></td>
-            <td colspan="2">56–74 m²<br><small>(600–800 ft²)</small></td>
-          </tr>
-        </tbody>
-      </table>
+  <!-- COMPONENT SELECTOR -->
+  <div class="selector-group">
+    <div class="selector-label">Component</div>
+    <div class="btn-row" id="compare-comp-btns">
+      <button class="btn active-comp" onclick="selectCompareComp('containers')">Containers</button>
+      <button class="btn" onclick="selectCompareComp('interior')">Interior</button>
+      <button class="btn" onclick="selectCompareComp('exterior')">Exterior</button>
+      <button class="btn" onclick="selectCompareComp('scents')">Scents</button>
     </div>
-    <div class="info-box">Note: Open container search area text (9.6.4) states max 56 m² (600 ft²); the summary table in the rulebook shows 74 m² (800 ft²). The 56 m² figure from the paragraph text is used here as it is the more specific citation.</div>
   </div>
 
-  <!-- INTERIOR -->
-  <div style="margin-bottom:28px;">
-    <div class="section-head" style="margin-bottom:10px;">🐾 9.7 — Interior Component</div>
-    <div class="compare-wrap">
-      <table class="compare-table">
-        <thead>
-          <tr>
-            <th style="text-align:left;">Specification</th>
-            <th class="class-head">Novice</th>
-            <th class="class-head">Open</th>
-            <th class="class-head">Excellent</th>
-            <th class="class-head">Master</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td class="row-label"># Hides</td>
-            <td>1 known</td><td>2 known</td>
-            <td>3 known total<br><small>(split across 2 areas, distribution unknown)</small></td>
-            <td><strong>1–3 unknown</strong><br><small>(max 3 across 2–3 areas; 1 area may be blank)</small></td>
-          </tr>
-          <tr>
-            <td class="row-label">Time Limit</td>
-            <td>3 min</td><td>3 min</td><td>3 min per area</td><td>3 min per area</td>
-          </tr>
-          <tr>
-            <td class="row-label">Distractions</td>
-            <td>None</td><td>1 Toy</td><td>2 (Toy or Food)</td><td>3 (Toy, Food, or Human)</td>
-          </tr>
-          <tr>
-            <td class="row-label">Required Calls</td>
-            <td>Alert</td><td>2× Alert</td>
-            <td>3× Alert + Finish (per area)</td>
-            <td>Alert(s) + Finish/Clear (per area)</td>
-          </tr>
-          <tr>
-            <td class="row-label">Max Hide Height</td>
-            <td>61 cm (24 in)</td><td>91 cm (36 in)</td><td>122 cm (48 in)</td><td>122 cm (48 in)⚑</td>
-          </tr>
-          <tr>
-            <td class="row-label">Accessibility</td>
-            <td>Accessible only</td><td>Accessible only</td>
-            <td>1 hide may be inaccessible</td><td>All hides may be inaccessible</td>
-          </tr>
-          <tr>
-            <td class="row-label">Search Area</td>
-            <td>9.3–18.6 m²<br><small>(100–200 ft²)</small></td>
-            <td>18.6–37 m²<br><small>(200–400 ft²)</small></td>
-            <td>37–74 m² total<br><small>(400–800 ft² across 2 areas)</small></td>
-            <td>56–93 m² total<br><small>(600–1000 ft² across 2–3 areas)</small></td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
-    <div class="info-box">⚑ Note: The Master Interior paragraph text (9.7.6) states max 122 cm (48 in), but the Interior summary table shows 152 cm (60 in). Verify against your copy of the rulebook.</div>
-    <div class="info-box" style="margin-top:6px;">Instinct class does not compete in Interior or Exterior components.</div>
-  </div>
+  <div id="compare-panel"></div>
 
-  <!-- EXTERIOR -->
-  <div style="margin-bottom:28px;">
-    <div class="section-head" style="margin-bottom:10px;">🐾 9.8 — Exterior Component</div>
-    <div class="compare-wrap">
-      <table class="compare-table">
-        <thead>
-          <tr>
-            <th style="text-align:left;">Specification</th>
-            <th class="class-head">Novice</th>
-            <th class="class-head">Open</th>
-            <th class="class-head">Excellent</th>
-            <th class="class-head">Master</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td class="row-label"># Hides</td>
-            <td>1 known</td><td>2 known</td>
-            <td>3 known<br><small>(1 may be inaccessible)</small></td>
-            <td><strong>1–3 unknown</strong><br><small>(all may be inaccessible)</small></td>
-          </tr>
-          <tr>
-            <td class="row-label">Time Limit</td>
-            <td><strong>4 min</strong></td><td><strong>4 min</strong></td><td><strong>5 min</strong></td><td><strong>5 min</strong></td>
-          </tr>
-          <tr>
-            <td class="row-label">Distractions</td>
-            <td>None</td><td>1 Toy</td><td>2 (Toy or Food)</td><td>3 (Toy, Food, or Human)</td>
-          </tr>
-          <tr>
-            <td class="row-label">Required Calls</td>
-            <td>Alert</td><td>2× Alert</td>
-            <td>3× Alert (stops clock)</td>
-            <td>Alert(s) + Finish/Clear</td>
-          </tr>
-          <tr>
-            <td class="row-label">Max Hide Height</td>
-            <td>61 cm (24 in)</td><td>91 cm (36 in)</td><td>122 cm (48 in)</td><td>122 cm (48 in)</td>
-          </tr>
-          <tr>
-            <td class="row-label">Accessibility</td>
-            <td>Accessible only</td><td>Accessible only</td>
-            <td>1 hide may be inaccessible</td><td>All hides may be inaccessible</td>
-          </tr>
-          <tr>
-            <td class="row-label">Search Area</td>
-            <td>18.6–37 m²<br><small>(200–400 ft²)</small></td>
-            <td>37–74 m²<br><small>(400–800 ft²)</small></td>
-            <td>74–139 m²<br><small>(800–1500 ft²)</small></td>
-            <td>139–186 m²<br><small>(1500–2000 ft²)</small></td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
-    <div class="info-box">Exterior searches test the dog in natural airflow with everyday environmental distractions. The area may be covered but must have no more than two walls. Boundaries are marked with coloured tape, flags, fencing, ring gates, or similar.</div>
-  </div>
-
-  <!-- SCENTS -->
-  <div>
-    <div class="section-head" style="margin-bottom:10px;">🐾 9.3.7 — Official Scents</div>
-    <div class="compare-wrap">
-      <table class="compare-table">
-        <thead>
-          <tr>
-            <th style="text-align:left;">Odour</th>
-            <th style="text-align:left;">Botanical Name</th>
-            <th>Code</th>
-            <th>Instinct</th><th>Novice</th><th>Open</th><th>Excellent</th><th>Master</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td><span class="scent-pill pill-wg">Wintergreen</span></td>
-            <td style="font-style:italic;font-size:12px;text-align:left;">Gaultharia procumbens</td>
-            <td style="font-family:'Source Code Pro',monospace;font-weight:700;">W</td>
-            <td>✓</td><td>✓</td><td>✓</td><td>✓</td><td>✓</td>
-          </tr>
-          <tr>
-            <td><span class="scent-pill pill-pine">Pine</span></td>
-            <td style="font-style:italic;font-size:12px;text-align:left;">Pinus sylvestris</td>
-            <td style="font-family:'Source Code Pro',monospace;font-weight:700;">P</td>
-            <td>—</td><td>—</td><td>✓</td><td>✓</td><td>✓</td>
-          </tr>
-          <tr>
-            <td><span class="scent-pill pill-anise">Anise</span></td>
-            <td style="font-style:italic;font-size:12px;text-align:left;">Pimpinella anisum</td>
-            <td style="font-family:'Source Code Pro',monospace;font-weight:700;">A</td>
-            <td>—</td><td>—</td><td>—</td><td>✓</td><td>✓</td>
-          </tr>
-          <tr>
-            <td><span class="scent-pill pill-clove">Clove</span></td>
-            <td style="font-style:italic;font-size:12px;text-align:left;">Eugenia caryophyllata</td>
-            <td style="font-family:'Source Code Pro',monospace;font-weight:700;">CL</td>
-            <td>—</td><td>—</td><td>—</td><td>—</td><td>✓</td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
-    <div class="info-box">1 drop essential oil → cotton ball or cotton swab (cut in half if paper-ended) → sealed glass jar → stand 72–24 hrs before trial. Glass must be used for preparation and storage. Plastic vessels are allowed in the search area, but scent aids must be removed from plastic for storage.</div>
-  </div>
 </div>
 
 <!-- ══════════════════════════════════════════════════════
@@ -1447,9 +1248,148 @@ function renderRules() {
 }
 
 // ═══════════════════════════════════════════════════════════════
-// INIT
+// COMPARE PAGE
 // ═══════════════════════════════════════════════════════════════
+const COMPARE_DATA = {
+  containers: {
+    title: '🐾 9.6 — Containers', note: 'Open search area: rulebook paragraph text states max 56 m² (600 ft²); summary table shows 74 m² (800 ft²). The 56 m² figure is used here.',
+    classes: [
+      { name:'Instinct', color:'#7a5c00', rows:[
+        ['Scents','Wintergreen (W)'],['# Containers','5'],['Type','Identical boxes'],
+        ['Arrangement','1 row of 5'],['Min. Distance','30 cm all directions'],
+        ['# Hides','1 (known)'],['Time Limit','2 minutes'],['Distractions','None'],
+        ['Required Calls','Alert only'],['Search Area','23–37 m² (250–400 ft²)'],
+      ]},
+      { name:'Novice', color:'#1e5c30', rows:[
+        ['Scents','Wintergreen (W)'],['# Containers','10'],['Type','Identical boxes'],
+        ['Arrangement','2 rows of 5'],['Min. Distance','30 cm between; 91 cm between rows'],
+        ['# Hides','1 (known)'],['Time Limit','2 minutes'],['Distractions','None'],
+        ['Required Calls','Alert only'],['Search Area','23–37 m² (250–400 ft²)'],
+      ]},
+      { name:'Open', color:'#1a4a7a', rows:[
+        ['Scents','Wintergreen (W), Pine (P)'],['# Containers','15'],['Type','Various size & type'],
+        ['Arrangement','3 rows / circle / "U"'],['Min. Distance','30 cm between; 91 cm between rows'],
+        ['# Hides','2 (known)'],['Time Limit','2 minutes'],['Distractions','1 Toy'],
+        ['Required Calls','2× Alert'],['Search Area','37–56 m² (400–600 ft²)'],
+      ]},
+      { name:'Excellent', color:'#5a2a78', rows:[
+        ['Scents','Wintergreen (W), Pine (P), Anise (A)'],['# Containers','20'],['Type','Various size & type'],
+        ['Arrangement','4 rows / circle / "U"'],['Min. Distance','30 cm between; 91 cm between rows'],
+        ['# Hides','3 (known)'],['Time Limit','3 minutes'],['Distractions','2 (Toy or Food)'],
+        ['Required Calls','3× Alert'],['Search Area','56–74 m² (600–800 ft²)'],
+      ]},
+      { name:'Master', color:'#8a2020', rows:[
+        ['Scents','Wintergreen (W), Pine (P), Anise (A), Clove (CL)'],['# Containers','20'],['Type','Various size & type'],
+        ['Arrangement','4 rows / circle / "U"'],['Min. Distance','30 cm between; 91 cm between rows'],
+        ['# Hides','1–3 (UNKNOWN)'],['Time Limit','3 minutes'],['Distractions','3 (Toy, Food, or Human)'],
+        ['Required Calls','Alert(s) + Finish/Clear'],['Search Area','56–74 m² (600–800 ft²)'],
+      ]},
+    ]
+  },
+  interior: {
+    title: '🐾 9.7 — Interior', note: '⚑ Master Interior: paragraph text states max 122 cm (48 in); summary table shows 152 cm (60 in). Verify against your rulebook. Instinct class does not compete in Interior.',
+    classes: [
+      { name:'Novice', color:'#1e5c30', rows:[
+        ['Scents','Wintergreen (W)'],['# Hides','1 (known)'],['Time Limit','3 minutes'],
+        ['Distractions','None'],['Required Calls','Alert only'],['Max Hide Height','61 cm (24 in)'],
+        ['Accessibility','Accessible only'],['Search Area','9.3–18.6 m² (100–200 ft²)'],['Areas','1'],
+      ]},
+      { name:'Open', color:'#1a4a7a', rows:[
+        ['Scents','Wintergreen (W), Pine (P)'],['# Hides','2 (known)'],['Time Limit','3 minutes'],
+        ['Distractions','1 Toy'],['Required Calls','2× Alert'],['Max Hide Height','91 cm (36 in)'],
+        ['Accessibility','Accessible only'],['Search Area','18.6–37 m² (200–400 ft²)'],['Areas','1'],
+      ]},
+      { name:'Excellent', color:'#5a2a78', rows:[
+        ['Scents','Wintergreen (W), Pine (P), Anise (A)'],['# Hides','3 known total (split across 2 areas — distribution unknown to handler)'],['Time Limit','3 minutes per area'],
+        ['Distractions','2 (Toy or Food)'],['Required Calls','3× Alert + Finish per area'],['Max Hide Height','122 cm (48 in)'],
+        ['Accessibility','1 hide may be inaccessible'],['Search Area','37–74 m² total (400–800 ft²)'],['Areas','2'],
+      ]},
+      { name:'Master', color:'#8a2020', rows:[
+        ['Scents','Wintergreen, Pine, Anise, Clove'],['# Hides','1–3 unknown (max 3; 1 area may be blank)'],['Time Limit','3 minutes per area'],
+        ['Distractions','3 (Toy, Food, or Human)'],['Required Calls','Alert(s) + Finish/Clear per area'],['Max Hide Height','122 cm (48 in) ⚑'],
+        ['Accessibility','All hides may be inaccessible'],['Search Area','56–93 m² total (600–1000 ft²)'],['Areas','2–3'],
+      ]},
+    ]
+  },
+  exterior: {
+    title: '🐾 9.8 — Exterior', note: 'Exterior searches have longer time limits than Containers and Interior. Area may be covered but must have no more than 2 walls. Instinct class does not compete in Exterior.',
+    classes: [
+      { name:'Novice', color:'#1e5c30', rows:[
+        ['Scents','Wintergreen (W)'],['# Hides','1 (known)'],['Time Limit','4 minutes'],
+        ['Distractions','None'],['Required Calls','Alert only'],['Max Hide Height','61 cm (24 in)'],
+        ['Accessibility','Accessible only'],['Search Area','18.6–37 m² (200–400 ft²)'],
+      ]},
+      { name:'Open', color:'#1a4a7a', rows:[
+        ['Scents','Wintergreen (W), Pine (P)'],['# Hides','2 (known)'],['Time Limit','4 minutes'],
+        ['Distractions','1 Toy'],['Required Calls','2× Alert'],['Max Hide Height','91 cm (36 in)'],
+        ['Accessibility','Accessible only'],['Search Area','37–74 m² (400–800 ft²)'],
+      ]},
+      { name:'Excellent', color:'#5a2a78', rows:[
+        ['Scents','Wintergreen (W), Pine (P), Anise (A)'],['# Hides','3 known (1 may be inaccessible)'],['Time Limit','5 minutes'],
+        ['Distractions','2 (Toy or Food)'],['Required Calls','3× Alert (stops clock)'],['Max Hide Height','122 cm (48 in)'],
+        ['Accessibility','1 hide may be inaccessible'],['Search Area','74–139 m² (800–1500 ft²)'],
+      ]},
+      { name:'Master', color:'#8a2020', rows:[
+        ['Scents','Wintergreen, Pine, Anise, Clove'],['# Hides','1–3 unknown (all may be inaccessible)'],['Time Limit','5 minutes'],
+        ['Distractions','3 (Toy, Food, or Human)'],['Required Calls','Alert(s) + Finish/Clear'],['Max Hide Height','122 cm (48 in)'],
+        ['Accessibility','All hides may be inaccessible'],['Search Area','139–186 m² (1500–2000 ft²)'],
+      ]},
+    ]
+  },
+  scents: {
+    title: '🐾 9.3.7 — Official Scents', note: '1 drop essential oil → cotton ball or swab → sealed glass jar → 72–24 hrs before trial. Glass required for storage. Plastic vessels allowed in search area only.',
+    classes: [
+      { name:'Wintergreen (W)', color:'#2a6a10', rows:[
+        ['Botanical Name','Gaultharia procumbens'],['Code','W'],
+        ['Used In','All classes: Instinct, Novice, Open, Excellent, Master'],
+      ]},
+      { name:'Pine (P)', color:'#0a5a8a', rows:[
+        ['Botanical Name','Pinus sylvestris'],['Code','P'],
+        ['Used In','Open, Excellent, Master'],
+      ]},
+      { name:'Anise (A)', color:'#8a4a00', rows:[
+        ['Botanical Name','Pimpinella anisum'],['Code','A'],
+        ['Used In','Excellent, Master'],
+      ]},
+      { name:'Clove (CL)', color:'#8a0a40', rows:[
+        ['Botanical Name','Eugenia caryophyllata'],['Code','CL'],
+        ['Used In','Master only'],
+      ]},
+    ]
+  }
+};
+
+let compareComp = 'containers';
+
+function selectCompareComp(comp) {
+  compareComp = comp;
+  document.querySelectorAll('#compare-comp-btns .btn').forEach((b, i) => {
+    b.classList.toggle('active-comp', ['containers','interior','exterior','scents'][i] === comp);
+  });
+  renderCompare();
+}
+
+function renderCompare() {
+  const data = COMPARE_DATA[compareComp];
+  const cardsHTML = data.classes.map(cls => `
+    <div class="compare-class-card">
+      <div class="compare-class-card-header" style="background:${cls.color};">${cls.name}</div>
+      ${cls.rows.map(([label, val]) => `
+        <div class="compare-row">
+          <div class="compare-row-label">${label}</div>
+          <div class="compare-row-val">${val}</div>
+        </div>`).join('')}
+    </div>`).join('');
+
+  document.getElementById('compare-panel').innerHTML = `
+    <div class="fade-in">
+      <div style="font-family:'Source Code Pro',monospace;font-size:11px;font-weight:700;color:var(--orange2);letter-spacing:1px;text-transform:uppercase;margin-bottom:12px;">${data.title}</div>
+      <div class="compare-class-cards">${cardsHTML}</div>
+      <div class="info-box" style="margin-top:12px;">${data.note}</div>
+    </div>`;
+}
 renderRules();
+renderCompare();
 
 // ═══════════════════════════════════════════════════════════════
 // PWA — register service worker for offline support
