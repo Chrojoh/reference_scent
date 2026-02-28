@@ -290,6 +290,13 @@
     <div>Rules Effective <strong>January 1, 2024</strong></div>
     <div>Source: CKC Scent Detection Trial Rules &amp; Regulations</div>
   </div>
+  <button id="install-btn" onclick="installApp()" style="display:none;
+    margin-left:12px; padding:8px 14px;
+    background:var(--orange); color:#fff; border:none; border-radius:4px;
+    font-family:'Source Code Pro',monospace; font-size:10px; letter-spacing:1px;
+    cursor:pointer; flex-shrink:0; font-weight:600;">
+    ⬇ Install App
+  </button>
 </div>
 
 <!-- TABS -->
@@ -1417,6 +1424,33 @@ renderRules();
 // ═══════════════════════════════════════════════════════════════
 if ('serviceWorker' in navigator) {
   navigator.serviceWorker.register('./sw.js').catch(() => {});
+}
+
+// ═══════════════════════════════════════════════════════════════
+// PWA INSTALL BUTTON
+// Captures the browser's install prompt before it disappears,
+// then shows our own button so the user can install any time.
+// ═══════════════════════════════════════════════════════════════
+let deferredPrompt = null;
+
+window.addEventListener('beforeinstallprompt', e => {
+  e.preventDefault();                          // stop the automatic banner
+  deferredPrompt = e;                          // save it for later
+  document.getElementById('install-btn').style.display = 'block'; // show our button
+});
+
+window.addEventListener('appinstalled', () => {
+  document.getElementById('install-btn').style.display = 'none';  // hide after install
+  deferredPrompt = null;
+});
+
+function installApp() {
+  if (!deferredPrompt) return;
+  deferredPrompt.prompt();                     // trigger the real install dialog
+  deferredPrompt.userChoice.then(() => {
+    deferredPrompt = null;
+    document.getElementById('install-btn').style.display = 'none';
+  });
 }
 </script>
 </body>
