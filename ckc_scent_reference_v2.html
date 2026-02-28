@@ -1,0 +1,1442 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CKC Scent Detection — Rules Reference</title>
+
+<!-- PWA: makes the page installable as a home screen app -->
+<link rel="manifest" href="data:application/json,{
+  %22name%22:%22CKC%20Scent%20Detection%22,
+  %22short_name%22:%22CKC%20Scent%22,
+  %22description%22:%22CKC%20Scent%20Detection%20Trial%20Rules%20Reference%22,
+  %22start_url%22:%22.%22,
+  %22display%22:%22standalone%22,
+  %22background_color%22:%22%23f4f1ec%22,
+  %22theme_color%22:%22%231a1008%22,
+  %22icons%22:[{%22src%22:%22data:image/svg+xml,%3Csvg%20xmlns%3D'http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg'%20viewBox%3D'0%200%20512%20512'%3E%3Crect%20width%3D'512'%20height%3D'512'%20rx%3D'80'%20fill%3D'%231a1008'%2F%3E%3Ccircle%20cx%3D'256'%20cy%3D'256'%20r%3D'180'%20fill%3D'%23c85f00'%2F%3E%3Ctext%20x%3D'256'%20y%3D'310'%20text-anchor%3D'middle'%20font-size%3D'180'%20font-family%3D'serif'%20fill%3D'white'%3E%F0%9F%90%BE%3C%2Ftext%3E%3C%2Fsvg%3E%22,%22sizes%22:%22512x512%22,%22type%22:%22image/svg+xml%22,%22purpose%22:%22any%20maskable%22}]
+}">
+<meta name="theme-color" content="#1a1008">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="CKC Scent">
+
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=Source+Code+Pro:wght@400;600&family=Crimson+Pro:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg:        #f4f1ec;
+    --bg2:       #ffffff;
+    --bg3:       #ede9e2;
+    --border:    #d6cfc4;
+    --border2:   #c4baac;
+    --orange:    #c85f00;
+    --orange2:   #a84f00;
+    --orange-dim:#c85f0030;
+    --orange-bg: #fff6ee;
+    --green:     #1e5c30;
+    --red:       #b03020;
+    --blue:      #1a4a7a;
+    --text:      #1a1612;
+    --text2:     #4a4038;
+    --text3:     #6a5c50;
+    --wg-bg:     #e8f5e0; --wg-b: #4a9020; --wg-t: #2a6a10;
+    --pine-bg:   #d8eef8; --pine-b: #1a7aaa; --pine-t: #0a5a8a;
+    --anise-bg:  #f8ecd8; --anise-b: #aa6a10; --anise-t: #8a4a00;
+    --clove-bg:  #f8d8e8; --clove-b: #aa2060; --clove-t: #8a0a40;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Crimson Pro', Georgia, serif;
+    min-height: 100vh;
+  }
+
+  /* ── HEADER ── */
+  .header {
+    background: #1a1008;
+    border-bottom: 3px solid var(--orange);
+    padding: 16px 24px;
+    display: flex; align-items: center; gap: 16px;
+  }
+  .header-logo {
+    width: 52px; height: 52px;
+    background: var(--orange); border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 20px; font-weight: 900; color: #fff;
+    font-family: 'Playfair Display', serif; flex-shrink: 0;
+    box-shadow: 0 0 24px #c85f0060;
+  }
+  .header-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 22px; font-weight: 900; color: #fff; line-height: 1.1;
+  }
+  .header-title span { color: var(--orange); }
+  .header-sub {
+    font-family: 'Source Code Pro', monospace;
+    font-size: 9px; letter-spacing: 3px; color: #9a8070;
+    text-transform: uppercase; margin-top: 4px;
+  }
+  .header-badge {
+    margin-left: auto; font-family: 'Source Code Pro', monospace;
+    font-size: 9px; color: #7a6858; letter-spacing: 2px; text-align: right; line-height: 2;
+  }
+  .header-badge strong { color: #c89060; }
+
+  /* ── TABS ── */
+  .tabs {
+    display: flex; background: #1a1008;
+    border-bottom: 1px solid #3a2a1a; padding: 0 24px;
+  }
+  .tab {
+    padding: 13px 20px;
+    font-family: 'Source Code Pro', monospace;
+    font-size: 10px; letter-spacing: 2px; text-transform: uppercase; font-weight: 600;
+    color: #7a6858; cursor: pointer; border-bottom: 2px solid transparent; transition: all 0.15s;
+  }
+  .tab:hover { color: #bfa880; }
+  .tab.active { color: var(--orange); border-bottom-color: var(--orange); }
+
+  /* ── PAGE LAYOUT ── */
+  .page { display: none; padding: 24px; max-width: 1100px; margin: 0 auto; }
+  .page.active { display: block; }
+
+  /* ── SELECTORS ── */
+  .selector-group { margin-bottom: 14px; }
+  .selector-label {
+    font-family: 'Source Code Pro', monospace;
+    font-size: 9px; letter-spacing: 3px; color: var(--text3);
+    text-transform: uppercase; margin-bottom: 8px; font-weight: 700;
+  }
+  .btn-row { display: flex; gap: 6px; flex-wrap: wrap; }
+  .btn {
+    padding: 8px 16px; background: var(--bg3); color: var(--text2);
+    border: 1px solid var(--border); border-radius: 3px; cursor: pointer;
+    font-family: 'Source Code Pro', monospace; font-size: 10px; letter-spacing: 1px; font-weight: 600;
+    transition: all 0.12s;
+  }
+  .btn:hover { color: var(--text); border-color: var(--border2); }
+  .btn.active-class { background: var(--orange-bg); color: var(--orange2); border-color: var(--orange); }
+  .btn.active-comp  { background: #1a4a7a18; color: #1a4a7a; border-color: #1a4a7a; }
+
+  /* ── CARDS ── */
+  .rules-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  @media(max-width:700px){ .rules-grid { grid-template-columns: 1fr; } }
+  .card { background: var(--bg2); border: 1px solid var(--border); border-radius: 5px; overflow: hidden; }
+  .card.full-width { grid-column: 1 / -1; }
+  .card-header {
+    padding: 12px 18px; border-bottom: 1px solid var(--border);
+    display: flex; justify-content: space-between; align-items: flex-start;
+    background: #faf8f5;
+  }
+  .card-title { font-family: 'Playfair Display', serif; font-size: 18px; font-weight: 700; }
+  .card-code  { font-family: 'Source Code Pro', monospace; font-size: 10px; color: var(--text3); margin-top: 3px; font-weight: 600; }
+  .card-body  { padding: 14px 18px; }
+
+  /* ── RULE ROWS ── */
+  .rule-row {
+    display: flex; justify-content: space-between; align-items: flex-start;
+    padding: 7px 0; border-bottom: 1px solid var(--border); gap: 12px; font-size: 14px;
+  }
+  .rule-row:last-child { border-bottom: none; }
+  .rule-label { color: var(--text3); min-width: 170px; flex-shrink: 0; font-weight: 600; }
+  .rule-val   { color: var(--text); text-align: right; }
+  .rule-val.hl   { color: var(--orange2); font-weight: 600; }
+  .rule-val.warn { color: #9a3000; font-weight: 600; }
+  .rule-val.good { color: var(--green); font-weight: 600; }
+
+  /* ── SCENT PILLS ── */
+  .scent-pill {
+    display: inline-block; padding: 2px 10px; border-radius: 12px;
+    font-family: 'Source Code Pro', monospace; font-size: 10px; margin: 2px; font-weight: 600;
+  }
+  .pill-wg    { background: var(--wg-bg);    border: 1px solid var(--wg-b);    color: var(--wg-t); }
+  .pill-pine  { background: var(--pine-bg);  border: 1px solid var(--pine-b);  color: var(--pine-t); }
+  .pill-anise { background: var(--anise-bg); border: 1px solid var(--anise-b); color: var(--anise-t); }
+  .pill-clove { background: var(--clove-bg); border: 1px solid var(--clove-b); color: var(--clove-t); }
+
+  /* ── FAULT ROWS ── */
+  .fault-row {
+    display: flex; gap: 10px; padding: 6px 0;
+    font-size: 13px; color: var(--text2);
+    border-bottom: 1px solid var(--border); line-height: 1.5;
+  }
+  .fault-row:last-child { border-bottom: none; }
+  .fault-icon        { flex-shrink: 0; font-weight: 700; font-size: 14px; }
+  .fault-icon.minor  { color: #c08000; }
+  .fault-icon.nq     { color: var(--red); }
+
+  /* ── SPECIAL RULES ── */
+  .special-rule {
+    display: flex; gap: 8px; padding: 6px 0;
+    font-size: 13px; color: var(--text2); line-height: 1.5;
+    border-bottom: 1px solid var(--border);
+  }
+  .special-rule:last-child { border-bottom: none; }
+  .special-rule-icon { color: var(--orange); flex-shrink: 0; }
+
+  /* ── PASS / INFO BOXES ── */
+  .pass-box {
+    background: var(--orange-bg); border: 1px solid var(--orange-dim); border-radius: 4px;
+    padding: 12px 16px; font-size: 13px; color: var(--text2); line-height: 1.6; font-style: italic;
+  }
+  .warn-box {
+    background: #fce8e4; border: 1px solid #e09080; border-radius: 4px;
+    padding: 10px 14px; font-size: 13px; color: #803020; line-height: 1.5; margin-top: 10px;
+  }
+  .info-box {
+    background: #f0f4f8; border: 1px solid #c0d0e0; border-radius: 4px;
+    padding: 10px 14px; font-size: 12px; color: var(--text3);
+    font-family: 'Source Code Pro', monospace; margin-top: 10px; line-height: 1.6;
+  }
+  .note-box {
+    background: #fff8e8; border: 1px solid #e8c060; border-radius: 4px;
+    padding: 10px 14px; font-size: 13px; color: #7a5000; line-height: 1.5;
+  }
+
+  /* ── BADGES ── */
+  .badge {
+    font-family: 'Source Code Pro', monospace; font-size: 9px;
+    padding: 3px 10px; border-radius: 3px; letter-spacing: 1px;
+  }
+  .badge-orange { background: var(--orange-bg); border: 1px solid var(--orange); color: var(--orange2); }
+  .badge-blue   { background: #e8f0f8; border: 1px solid #6090c0; color: #1a4a7a; }
+  .badge-red    { background: #fce8e4; border: 1px solid #e08060; color: #803020; }
+  .badge-green  { background: #e8f5e0; border: 1px solid #60a040; color: #1e5c30; }
+
+  /* ── COMPARE TABLE ── */
+  .compare-wrap { overflow-x: auto; }
+  .compare-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  .compare-table th, .compare-table td {
+    padding: 9px 12px; border: 1px solid var(--border);
+    text-align: center; vertical-align: middle;
+  }
+  .compare-table thead th {
+    background: #1a1008; color: #fff;
+    font-family: 'Source Code Pro', monospace;
+    font-size: 10px; letter-spacing: 2px; text-transform: uppercase; font-weight: 600;
+  }
+  .compare-table thead th.class-head { background: var(--orange); }
+  .compare-table tbody tr:nth-child(even) td { background: #faf8f5; }
+  .compare-table tbody td.row-label {
+    background: #f0ede8; text-align: left;
+    font-family: 'Source Code Pro', monospace;
+    font-size: 10px; font-weight: 700; letter-spacing: 1px; color: var(--text2); white-space: nowrap;
+  }
+  .compare-table tbody td.group-head {
+    background: #1a1008; color: var(--orange);
+    font-family: 'Source Code Pro', monospace;
+    font-size: 9px; letter-spacing: 3px; text-transform: uppercase;
+    text-align: left; font-weight: 700; padding: 6px 12px;
+  }
+
+  /* ── SECTION HEAD ── */
+  .section-head {
+    font-family: 'Source Code Pro', monospace;
+    font-size: 9px; letter-spacing: 3px; text-transform: uppercase;
+    color: var(--orange2); font-weight: 700; margin: 0;
+  }
+
+  /* ── COMPONENT HEADER STRIP ── */
+  .comp-header-strip {
+    display: flex; align-items: center; gap: 12px;
+    padding: 10px 18px; border-radius: 5px; margin-bottom: 16px;
+  }
+  .comp-header-strip .ch-class {
+    font-family: 'Playfair Display', serif; font-size: 20px; font-weight: 900; color: #fff;
+  }
+  .comp-header-strip .ch-comp {
+    font-family: 'Source Code Pro', monospace; font-size: 10px; letter-spacing: 3px;
+    text-transform: uppercase; color: rgba(255,255,255,0.7);
+  }
+  .comp-header-strip .ch-spacer { flex: 1; }
+  .comp-header-strip .ch-badge {
+    font-family: 'Source Code Pro', monospace; font-size: 9px; padding: 4px 10px;
+    border-radius: 3px; border: 1px solid rgba(255,255,255,0.4); color: #fff; letter-spacing: 1px;
+  }
+
+  /* ── TITLES PAGE ── */
+  .title-card {
+    background: var(--bg2); border: 1px solid var(--border); border-radius: 5px;
+    overflow: hidden; margin-bottom: 14px;
+  }
+  .title-card-header {
+    padding: 14px 20px; display: flex; align-items: center; gap: 16px;
+    border-bottom: 1px solid var(--border);
+  }
+  .title-code-badge {
+    font-family: 'Playfair Display', serif; font-size: 22px; font-weight: 900;
+    color: var(--orange2); min-width: 80px; flex-shrink: 0;
+  }
+  .title-name { font-size: 16px; font-weight: 600; color: var(--text); }
+  .title-sub  { font-size: 13px; color: var(--text3); margin-top: 2px; }
+  .title-card-body { padding: 14px 20px; }
+  .title-req-row {
+    display: flex; gap: 12px; padding: 6px 0; font-size: 13px;
+    border-bottom: 1px solid var(--border); align-items: flex-start; line-height: 1.5;
+  }
+  .title-req-row:last-child { border-bottom: none; }
+  .title-req-label { color: var(--text3); font-weight: 600; min-width: 140px; flex-shrink: 0; }
+  .comp-title-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 14px; margin-top: 20px; }
+  @media(max-width:700px){ .comp-title-grid { grid-template-columns: 1fr; } }
+
+  /* ── FADE ── */
+  @keyframes fadeIn { from { opacity:0; transform:translateY(6px); } to { opacity:1; transform:none; } }
+  .fade-in { animation: fadeIn 0.2s ease-out; }
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<div class="header">
+  <div class="header-logo">🐾</div>
+  <div>
+    <div class="header-title"><span>Scent Detection</span> Trial</div>
+    <div class="header-sub">Canadian Kennel Club · Rules Reference</div>
+  </div>
+  <div class="header-badge">
+    <div>Rules Effective <strong>January 1, 2024</strong></div>
+    <div>Source: CKC Scent Detection Trial Rules &amp; Regulations</div>
+  </div>
+</div>
+
+<!-- TABS -->
+<div class="tabs">
+  <div class="tab active"  onclick="switchTab('rules')">Rules Reference</div>
+  <div class="tab"         onclick="switchTab('compare')">Quick Compare</div>
+  <div class="tab"         onclick="switchTab('faults')">Faults Guide</div>
+  <div class="tab"         onclick="switchTab('titles')">Titles &amp; Awards</div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════
+     PAGE: RULES REFERENCE
+══════════════════════════════════════════════════════ -->
+<div id="page-rules" class="page active">
+  <div class="selector-group">
+    <div class="selector-label">Class</div>
+    <div class="btn-row" id="class-btns">
+      <button class="btn active-class" onclick="selectClass('instinct')">Instinct</button>
+      <button class="btn" onclick="selectClass('novice')">Novice</button>
+      <button class="btn" onclick="selectClass('open')">Open</button>
+      <button class="btn" onclick="selectClass('excellent')">Excellent</button>
+      <button class="btn" onclick="selectClass('master')">Master</button>
+    </div>
+  </div>
+  <div class="selector-group">
+    <div class="selector-label">Component</div>
+    <div class="btn-row" id="comp-btns">
+      <button class="btn active-comp" onclick="selectComp('containers')">Containers</button>
+      <button class="btn" onclick="selectComp('interior')">Interior</button>
+      <button class="btn" onclick="selectComp('exterior')">Exterior</button>
+    </div>
+  </div>
+  <div id="rules-panel"></div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════
+     PAGE: QUICK COMPARE
+══════════════════════════════════════════════════════ -->
+<div id="page-compare" class="page">
+
+  <!-- CONTAINERS -->
+  <div style="margin-bottom:28px;">
+    <div class="section-head" style="margin-bottom:10px;">🐾 9.6 — Container Component</div>
+    <div class="compare-wrap">
+      <table class="compare-table">
+        <thead>
+          <tr>
+            <th style="text-align:left;">Specification</th>
+            <th class="class-head">Instinct</th>
+            <th class="class-head">Novice</th>
+            <th class="class-head">Open</th>
+            <th class="class-head">Excellent</th>
+            <th class="class-head">Master</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td class="group-head" colspan="6">Odour</td></tr>
+          <tr>
+            <td class="row-label">Target Scent(s)</td>
+            <td><span class="scent-pill pill-wg">W</span></td>
+            <td><span class="scent-pill pill-wg">W</span></td>
+            <td><span class="scent-pill pill-wg">W</span><br><span class="scent-pill pill-pine">P</span></td>
+            <td><span class="scent-pill pill-wg">W</span><br><span class="scent-pill pill-pine">P</span><br><span class="scent-pill pill-anise">A</span></td>
+            <td><span class="scent-pill pill-wg">W</span><br><span class="scent-pill pill-pine">P</span><br><span class="scent-pill pill-anise">A</span><br><span class="scent-pill pill-clove">CL</span></td>
+          </tr>
+          <tr><td class="group-head" colspan="6">Containers</td></tr>
+          <tr>
+            <td class="row-label"># Containers</td>
+            <td>5</td><td>10</td><td>15</td><td>20</td><td>20</td>
+          </tr>
+          <tr>
+            <td class="row-label">Type</td>
+            <td>Identical boxes</td><td>Identical boxes</td>
+            <td colspan="3">Various size &amp; type</td>
+          </tr>
+          <tr>
+            <td class="row-label">Arrangement</td>
+            <td>1 row of 5</td><td>2 rows of 5</td>
+            <td>3 rows / circle / "U"</td>
+            <td colspan="2">4 rows / circle / "U"</td>
+          </tr>
+          <tr>
+            <td class="row-label">Min. Distance</td>
+            <td>30 cm all directions</td>
+            <td colspan="4">30 cm between containers; 91 cm between rows</td>
+          </tr>
+          <tr><td class="group-head" colspan="6">Hides &amp; Search</td></tr>
+          <tr>
+            <td class="row-label"># Hides</td>
+            <td>1 known</td><td>1 known</td><td>2 known</td><td>3 known</td>
+            <td><strong>1–3 unknown</strong></td>
+          </tr>
+          <tr>
+            <td class="row-label">Time Limit</td>
+            <td>2 min</td><td>2 min</td><td>2 min</td><td>3 min</td><td>3 min</td>
+          </tr>
+          <tr>
+            <td class="row-label">Distractions</td>
+            <td>None</td><td>None</td><td>1 Toy</td>
+            <td>2 (Toy or Food)</td><td>3 (Toy, Food, or Human)</td>
+          </tr>
+          <tr>
+            <td class="row-label">Required Calls</td>
+            <td>Alert</td><td>Alert</td><td>2× Alert</td><td>3× Alert</td>
+            <td>Alert(s) + Finish/Clear</td>
+          </tr>
+          <tr>
+            <td class="row-label">Search Area</td>
+            <td>23–37 m²<br><small>(250–400 ft²)</small></td>
+            <td>23–37 m²<br><small>(250–400 ft²)</small></td>
+            <td>37–56 m²<br><small>(400–600 ft²)</small></td>
+            <td colspan="2">56–74 m²<br><small>(600–800 ft²)</small></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="info-box">Note: Open container search area text (9.6.4) states max 56 m² (600 ft²); the summary table in the rulebook shows 74 m² (800 ft²). The 56 m² figure from the paragraph text is used here as it is the more specific citation.</div>
+  </div>
+
+  <!-- INTERIOR -->
+  <div style="margin-bottom:28px;">
+    <div class="section-head" style="margin-bottom:10px;">🐾 9.7 — Interior Component</div>
+    <div class="compare-wrap">
+      <table class="compare-table">
+        <thead>
+          <tr>
+            <th style="text-align:left;">Specification</th>
+            <th class="class-head">Novice</th>
+            <th class="class-head">Open</th>
+            <th class="class-head">Excellent</th>
+            <th class="class-head">Master</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="row-label"># Hides</td>
+            <td>1 known</td><td>2 known</td>
+            <td>3 known total<br><small>(split across 2 areas, distribution unknown)</small></td>
+            <td><strong>1–3 unknown</strong><br><small>(max 3 across 2–3 areas; 1 area may be blank)</small></td>
+          </tr>
+          <tr>
+            <td class="row-label">Time Limit</td>
+            <td>3 min</td><td>3 min</td><td>3 min per area</td><td>3 min per area</td>
+          </tr>
+          <tr>
+            <td class="row-label">Distractions</td>
+            <td>None</td><td>1 Toy</td><td>2 (Toy or Food)</td><td>3 (Toy, Food, or Human)</td>
+          </tr>
+          <tr>
+            <td class="row-label">Required Calls</td>
+            <td>Alert</td><td>2× Alert</td>
+            <td>3× Alert + Finish (per area)</td>
+            <td>Alert(s) + Finish/Clear (per area)</td>
+          </tr>
+          <tr>
+            <td class="row-label">Max Hide Height</td>
+            <td>61 cm (24 in)</td><td>91 cm (36 in)</td><td>122 cm (48 in)</td><td>122 cm (48 in)⚑</td>
+          </tr>
+          <tr>
+            <td class="row-label">Accessibility</td>
+            <td>Accessible only</td><td>Accessible only</td>
+            <td>1 hide may be inaccessible</td><td>All hides may be inaccessible</td>
+          </tr>
+          <tr>
+            <td class="row-label">Search Area</td>
+            <td>9.3–18.6 m²<br><small>(100–200 ft²)</small></td>
+            <td>18.6–37 m²<br><small>(200–400 ft²)</small></td>
+            <td>37–74 m² total<br><small>(400–800 ft² across 2 areas)</small></td>
+            <td>56–93 m² total<br><small>(600–1000 ft² across 2–3 areas)</small></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="info-box">⚑ Note: The Master Interior paragraph text (9.7.6) states max 122 cm (48 in), but the Interior summary table shows 152 cm (60 in). Verify against your copy of the rulebook.</div>
+    <div class="info-box" style="margin-top:6px;">Instinct class does not compete in Interior or Exterior components.</div>
+  </div>
+
+  <!-- EXTERIOR -->
+  <div style="margin-bottom:28px;">
+    <div class="section-head" style="margin-bottom:10px;">🐾 9.8 — Exterior Component</div>
+    <div class="compare-wrap">
+      <table class="compare-table">
+        <thead>
+          <tr>
+            <th style="text-align:left;">Specification</th>
+            <th class="class-head">Novice</th>
+            <th class="class-head">Open</th>
+            <th class="class-head">Excellent</th>
+            <th class="class-head">Master</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="row-label"># Hides</td>
+            <td>1 known</td><td>2 known</td>
+            <td>3 known<br><small>(1 may be inaccessible)</small></td>
+            <td><strong>1–3 unknown</strong><br><small>(all may be inaccessible)</small></td>
+          </tr>
+          <tr>
+            <td class="row-label">Time Limit</td>
+            <td><strong>4 min</strong></td><td><strong>4 min</strong></td><td><strong>5 min</strong></td><td><strong>5 min</strong></td>
+          </tr>
+          <tr>
+            <td class="row-label">Distractions</td>
+            <td>None</td><td>1 Toy</td><td>2 (Toy or Food)</td><td>3 (Toy, Food, or Human)</td>
+          </tr>
+          <tr>
+            <td class="row-label">Required Calls</td>
+            <td>Alert</td><td>2× Alert</td>
+            <td>3× Alert (stops clock)</td>
+            <td>Alert(s) + Finish/Clear</td>
+          </tr>
+          <tr>
+            <td class="row-label">Max Hide Height</td>
+            <td>61 cm (24 in)</td><td>91 cm (36 in)</td><td>122 cm (48 in)</td><td>122 cm (48 in)</td>
+          </tr>
+          <tr>
+            <td class="row-label">Accessibility</td>
+            <td>Accessible only</td><td>Accessible only</td>
+            <td>1 hide may be inaccessible</td><td>All hides may be inaccessible</td>
+          </tr>
+          <tr>
+            <td class="row-label">Search Area</td>
+            <td>18.6–37 m²<br><small>(200–400 ft²)</small></td>
+            <td>37–74 m²<br><small>(400–800 ft²)</small></td>
+            <td>74–139 m²<br><small>(800–1500 ft²)</small></td>
+            <td>139–186 m²<br><small>(1500–2000 ft²)</small></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="info-box">Exterior searches test the dog in natural airflow with everyday environmental distractions. The area may be covered but must have no more than two walls. Boundaries are marked with coloured tape, flags, fencing, ring gates, or similar.</div>
+  </div>
+
+  <!-- SCENTS -->
+  <div>
+    <div class="section-head" style="margin-bottom:10px;">🐾 9.3.7 — Official Scents</div>
+    <div class="compare-wrap">
+      <table class="compare-table">
+        <thead>
+          <tr>
+            <th style="text-align:left;">Odour</th>
+            <th style="text-align:left;">Botanical Name</th>
+            <th>Code</th>
+            <th>Instinct</th><th>Novice</th><th>Open</th><th>Excellent</th><th>Master</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><span class="scent-pill pill-wg">Wintergreen</span></td>
+            <td style="font-style:italic;font-size:12px;text-align:left;">Gaultharia procumbens</td>
+            <td style="font-family:'Source Code Pro',monospace;font-weight:700;">W</td>
+            <td>✓</td><td>✓</td><td>✓</td><td>✓</td><td>✓</td>
+          </tr>
+          <tr>
+            <td><span class="scent-pill pill-pine">Pine</span></td>
+            <td style="font-style:italic;font-size:12px;text-align:left;">Pinus sylvestris</td>
+            <td style="font-family:'Source Code Pro',monospace;font-weight:700;">P</td>
+            <td>—</td><td>—</td><td>✓</td><td>✓</td><td>✓</td>
+          </tr>
+          <tr>
+            <td><span class="scent-pill pill-anise">Anise</span></td>
+            <td style="font-style:italic;font-size:12px;text-align:left;">Pimpinella anisum</td>
+            <td style="font-family:'Source Code Pro',monospace;font-weight:700;">A</td>
+            <td>—</td><td>—</td><td>—</td><td>✓</td><td>✓</td>
+          </tr>
+          <tr>
+            <td><span class="scent-pill pill-clove">Clove</span></td>
+            <td style="font-style:italic;font-size:12px;text-align:left;">Eugenia caryophyllata</td>
+            <td style="font-family:'Source Code Pro',monospace;font-weight:700;">CL</td>
+            <td>—</td><td>—</td><td>—</td><td>—</td><td>✓</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="info-box">1 drop essential oil → cotton ball or cotton swab (cut in half if paper-ended) → sealed glass jar → stand 72–24 hrs before trial. Glass must be used for preparation and storage. Plastic vessels are allowed in the search area, but scent aids must be removed from plastic for storage.</div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════
+     PAGE: FAULTS GUIDE
+══════════════════════════════════════════════════════ -->
+<div id="page-faults" class="page">
+  <div class="rules-grid">
+
+    <div class="card">
+      <div class="card-header">
+        <div>
+          <div class="section-head">🐾 9.5.13</div>
+          <div class="card-title" style="color:#8a6000;">Minor Faults</div>
+          <div class="card-code">One (1) minor fault permitted per search area and still qualify</div>
+        </div>
+        <span class="badge badge-orange" style="margin-top:4px;">1 allowed / search</span>
+      </div>
+      <div class="card-body">
+        <div class="fault-row"><span class="fault-icon minor">△</span><span>Dropped toy or food reward in the search area</span></div>
+        <div class="fault-row"><span class="fault-icon minor">△</span><span>Not crossing the designated start line</span></div>
+        <div class="fault-row"><span class="fault-icon minor">△</span><span>Handler cues the dog, or has the dog continue to search to pinpoint the hide location, when the judge asks "Where?"</span></div>
+        <div class="fault-row"><span class="fault-icon minor">△</span><span>Moving a container / object / distractor more than a few inches (by handler or dog, with any part of body)</span></div>
+        <div class="fault-row"><span class="fault-icon minor">△</span><span>Safety issues — e.g. taking dog off leash in an on-leash search, placing dog in an unsafe situation</span></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-header">
+        <div>
+          <div class="section-head">🐾 9.5.13</div>
+          <div class="card-title" style="color:var(--red);">Non-Qualifying Faults</div>
+          <div class="card-code">Any NQ fault = non-qualifying performance for that search area</div>
+        </div>
+        <span class="badge badge-red" style="margin-top:4px;">Immediate NQ</span>
+      </div>
+      <div class="card-body">
+        <div class="fault-row"><span class="fault-icon nq">✗</span><span>Damage to search area due to excessive pawing, digging, or scratching</span></div>
+        <div class="fault-row"><span class="fault-icon nq">✗</span><span>Picking up or biting a container/object (dog)</span></div>
+        <div class="fault-row"><span class="fault-icon nq">✗</span><span>Handler calls "Alert" on the incorrect location</span></div>
+        <div class="fault-row"><span class="fault-icon nq">✗</span><span>Handler calls "Finish" before all hides in the area have been located</span></div>
+        <div class="fault-row"><span class="fault-icon nq">✗</span><span>Maximum time for the class or search area is exceeded</span></div>
+        <div class="fault-row"><span class="fault-icon nq">✗</span><span>Handler is not able to point to the location of the hide when asked by the judge</span></div>
+        <div class="fault-row"><span class="fault-icon nq">✗</span><span>Any harsh handling or harsh corrections by the handler</span></div>
+        <div class="fault-row"><span class="fault-icon nq">✗</span><span>Dog disrupts the search area unduly — intentional biting, hard scratching, pouncing (note: dog's nose or feet simply getting caught on containers is not a fault)</span></div>
+        <div class="fault-row"><span class="fault-icon nq">✗</span><span>Safety issues — e.g. taking dog off leash in an on-leash search</span></div>
+        <div class="fault-row"><span class="fault-icon nq">✗</span><span><strong>Excellent / Master Interior &amp; Exterior:</strong> Failing to call "Finish" or "Clear" per search area before that area's time expires</span></div>
+        <div class="fault-row"><span class="fault-icon nq">✗</span><span><strong>Master Containers:</strong> Failing to call "Finish" or "Clear" before maximum course time elapses</span></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-header">
+        <div>
+          <div class="section-head">🐾 9.5</div>
+          <div class="card-title">Handler Rules During the Search</div>
+        </div>
+      </div>
+      <div class="card-body">
+        <div class="special-rule">
+          <span class="special-rule-icon">›</span>
+          <span>Say <strong>"Alert"</strong> to confirm each find. If verbal confirmation is not possible (environmental factors or disability), inform the judge of an alternate confirmation before the search begins — e.g. an obvious hand signal.</span>
+        </div>
+        <div class="special-rule">
+          <span class="special-rule-icon">›</span>
+          <span><strong>"Finish" / "Clear"</strong> — used in Master class (all components) and Excellent/Master Interior and Exterior. Must be called when handler believes all hides in the area have been found. Stops the clock for that area. Failure to call before time = NQ.</span>
+        </div>
+        <div class="special-rule">
+          <span class="special-rule-icon">›</span>
+          <span>Handlers <strong>may</strong> touch the dog at any time during the search for direction or praise.</span>
+        </div>
+        <div class="special-rule">
+          <span class="special-rule-icon">›</span>
+          <span>Handlers <strong>may not</strong> touch objects in the search area without express permission from the judge.</span>
+        </div>
+        <div class="special-rule">
+          <span class="special-rule-icon">›</span>
+          <span>After a correct find, handler may reward with food or toy. Toy must not be thrown or make noise. Food/toys <strong>cannot</strong> be used to bait the dog before or during the search.</span>
+        </div>
+        <div class="special-rule">
+          <span class="special-rule-icon">›</span>
+          <span>Handlers and spectators <strong>may not</strong> discuss the search, hide locations, or performance until all teams in the class have run.</span>
+        </div>
+        <div class="special-rule">
+          <span class="special-rule-icon">›</span>
+          <span>Handlers <strong>may not</strong> watch other exhibitors from their own class prior to their own turn.</span>
+        </div>
+        <div class="special-rule">
+          <span class="special-rule-icon">›</span>
+          <span>No person outside the search area may assist the handler or disclose hide locations. Spectators who give aid may be asked to leave by the judge.</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-header">
+        <div>
+          <div class="section-head">🐾 9.4</div>
+          <div class="card-title">Equipment Rules</div>
+        </div>
+      </div>
+      <div class="card-body">
+        <div class="special-rule">
+          <span style="color:var(--green);flex-shrink:0;font-weight:700;">✓</span>
+          <span><strong>Allowed:</strong> Plain, pliable collar or harness approved by the judge. Martingale collars. Treat pouches or fanny packs to carry food rewards. Paw covers, booties, jackets, sweaters, hair ties (judge has final say).</span>
+        </div>
+        <div class="special-rule">
+          <span class="fault-icon nq" style="flex-shrink:0;font-weight:700;">✗</span>
+          <span><strong>Not Allowed:</strong> Electronic collars, prong collars, head halters, choke chains, no-pull harnesses, belly bands, no-bark collars (including those that spray citronella or DAP calming collars).</span>
+        </div>
+        <div class="special-rule">
+          <span class="special-rule-icon">›</span>
+          <span>The final word on whether an accessory is allowed rests with the judge.</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="card full-width">
+      <div class="card-header">
+        <div>
+          <div class="section-head">🐾 9.9 — Distractions</div>
+          <div class="card-title">Distraction Rules</div>
+        </div>
+      </div>
+      <div class="card-body" style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:20px;">
+        <div>
+          <div style="font-family:'Source Code Pro',monospace;font-size:10px;font-weight:700;color:var(--orange2);letter-spacing:2px;text-transform:uppercase;margin-bottom:8px;">Toy Distractions</div>
+          <div class="special-rule"><span class="special-rule-icon">›</span><span>Must not contain any artificial scent such as another essential oil, perfume, or scented lotion.</span></div>
+          <div class="special-rule"><span class="special-rule-icon">›</span><span>In interior and exterior searches, toy distractions may be hidden or visible.</span></div>
+        </div>
+        <div>
+          <div style="font-family:'Source Code Pro',monospace;font-size:10px;font-weight:700;color:var(--orange2);letter-spacing:2px;text-transform:uppercase;margin-bottom:8px;">Food Distractions</div>
+          <div class="special-rule"><span class="special-rule-icon">›</span><span>May be any kind of dog food or human food (except foods harmful to dogs).</span></div>
+          <div class="special-rule"><span class="special-rule-icon">›</span><span>Must be enclosed in a container so the searching dog cannot consume the food or the container.</span></div>
+        </div>
+        <div>
+          <div style="font-family:'Source Code Pro',monospace;font-size:10px;font-weight:700;color:var(--orange2);letter-spacing:2px;text-transform:uppercase;margin-bottom:8px;">Human Distractions</div>
+          <div class="special-rule"><span class="special-rule-icon">›</span><span>A person other than the judge who is present inside the search area.</span></div>
+          <div class="special-rule"><span class="special-rule-icon">›</span><span>May be standing or sitting. May look at the dog but must not maintain eye contact if the dog's attention turns to them. May not speak to or intentionally touch the dog.</span></div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════
+     PAGE: TITLES & AWARDS
+══════════════════════════════════════════════════════ -->
+<div id="page-titles" class="page">
+
+  <div style="margin-bottom:24px;">
+    <div class="section-head" style="margin-bottom:10px;">🐾 10.1 — Class Titles</div>
+    <p style="font-size:14px;color:var(--text2);line-height:1.6;margin-bottom:16px;">
+      Class titles are earned by getting one (1) qualifying score in each of the three components (Containers, Interior, Exterior) at that class level. Qualifying scores do <em>not</em> have to be earned at the same trial. All titles are suffix titles.
+    </p>
+
+    <!-- SDIN -->
+    <div class="title-card">
+      <div class="title-card-header" style="background:#fff8ee;border-bottom:1px solid #e8d0b0;">
+        <div class="title-code-badge">SDIN</div>
+        <div>
+          <div class="title-name">Scent Detection Instinct</div>
+          <div class="title-sub">Optional entry-level title — Containers component only</div>
+        </div>
+        <span class="badge badge-orange" style="margin-left:auto;">Optional</span>
+      </div>
+      <div class="title-card-body">
+        <div class="title-req-row">
+          <span class="title-req-label">Prerequisite</span>
+          <span>None. Open to dogs who have not yet attained an SDN title.</span>
+        </div>
+        <div class="title-req-row">
+          <span class="title-req-label">Requirement</span>
+          <span>One (1) qualifying score in the Instinct class (Containers component only).</span>
+        </div>
+        <div class="title-req-row">
+          <span class="title-req-label">Components</span>
+          <span>Containers only — no Interior or Exterior at Instinct level.</span>
+        </div>
+        <div class="title-req-row">
+          <span class="title-req-label">Notes</span>
+          <span>This is an optional, standalone title. Earning SDIN is not required before progressing to Novice.</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- SDN -->
+    <div class="title-card">
+      <div class="title-card-header" style="background:#f0f8f0;border-bottom:1px solid #b0d0b0;">
+        <div class="title-code-badge" style="color:#1e5c30;">SDN</div>
+        <div>
+          <div class="title-name">Scent Detection Novice</div>
+          <div class="title-sub">First full class title — all three Novice components required</div>
+        </div>
+      </div>
+      <div class="title-card-body">
+        <div class="title-req-row">
+          <span class="title-req-label">Prerequisite</span>
+          <span>None. Open to all dogs who have not yet attained an SDO title.</span>
+        </div>
+        <div class="title-req-row">
+          <span class="title-req-label">Requirement</span>
+          <span>One (1) qualifying score in each of: Novice Containers + Novice Interior + Novice Exterior.</span>
+        </div>
+        <div class="title-req-row">
+          <span class="title-req-label">Same trial?</span>
+          <span>No — qualifying scores do not have to be earned at the same trial.</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- SDO -->
+    <div class="title-card">
+      <div class="title-card-header" style="background:#f0f0f8;border-bottom:1px solid #b0b8d0;">
+        <div class="title-code-badge" style="color:#1a4a7a;">SDO</div>
+        <div>
+          <div class="title-name">Scent Detection Open</div>
+          <div class="title-sub">All three Open components required</div>
+        </div>
+      </div>
+      <div class="title-card-body">
+        <div class="title-req-row">
+          <span class="title-req-label">Prerequisite</span>
+          <span>Must first obtain SDN (Scent Detection Novice). Open to dogs who have not yet attained an SDE title.</span>
+        </div>
+        <div class="title-req-row">
+          <span class="title-req-label">Requirement</span>
+          <span>One (1) qualifying score in each of: Open Containers + Open Interior + Open Exterior.</span>
+        </div>
+        <div class="title-req-row">
+          <span class="title-req-label">Same trial?</span>
+          <span>No — qualifying scores do not have to be earned at the same trial.</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- SDE -->
+    <div class="title-card">
+      <div class="title-card-header" style="background:#f8f0f8;border-bottom:1px solid #d0b0d0;">
+        <div class="title-code-badge" style="color:#5a2a78;">SDE</div>
+        <div>
+          <div class="title-name">Scent Detection Excellent</div>
+          <div class="title-sub">All three Excellent components required</div>
+        </div>
+      </div>
+      <div class="title-card-body">
+        <div class="title-req-row">
+          <span class="title-req-label">Prerequisite</span>
+          <span>Must first obtain SDO. Open to dogs who have not yet attained an SDM title.</span>
+        </div>
+        <div class="title-req-row">
+          <span class="title-req-label">Requirement</span>
+          <span>One (1) qualifying score in each of: Excellent Containers + Excellent Interior + Excellent Exterior.</span>
+        </div>
+        <div class="title-req-row">
+          <span class="title-req-label">Same trial?</span>
+          <span>No — qualifying scores do not have to be earned at the same trial.</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- SDM -->
+    <div class="title-card">
+      <div class="title-card-header" style="background:#fdf0f0;border-bottom:1px solid #d0b0b0;">
+        <div class="title-code-badge" style="color:#8a2020;">SDM</div>
+        <div>
+          <div class="title-name">Scent Detection Master</div>
+          <div class="title-sub">All three Master components required</div>
+        </div>
+      </div>
+      <div class="title-card-body">
+        <div class="title-req-row">
+          <span class="title-req-label">Prerequisite</span>
+          <span>Must first obtain SDE.</span>
+        </div>
+        <div class="title-req-row">
+          <span class="title-req-label">Requirement</span>
+          <span>One (1) qualifying score in each of: Master Containers + Master Interior + Master Exterior.</span>
+        </div>
+        <div class="title-req-row">
+          <span class="title-req-label">Same trial?</span>
+          <span>No — qualifying scores do not have to be earned at the same trial.</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- SDGM -->
+    <div class="title-card">
+      <div class="title-card-header" style="background:#1a1008;border-bottom:1px solid #3a2a1a;">
+        <div class="title-code-badge" style="color:var(--orange);">SDGM</div>
+        <div>
+          <div class="title-name" style="color:#fff;">Scent Detection Grand Master</div>
+          <div class="title-sub" style="color:#9a8070;">The highest class title — five additional Qs in every Master component</div>
+        </div>
+        <span class="badge" style="margin-left:auto;background:#2a1a08;border:1px solid var(--orange);color:var(--orange);">Post-SDM</span>
+      </div>
+      <div class="title-card-body">
+        <div class="title-req-row">
+          <span class="title-req-label">Prerequisite</span>
+          <span>Must have already obtained SDM.</span>
+        </div>
+        <div class="title-req-row">
+          <span class="title-req-label">Requirement</span>
+          <span>Five (5) additional qualifying scores in the Master class in <em>each</em> of the three components — Master Containers, Master Interior, and Master Exterior.</span>
+        </div>
+        <div class="title-req-row">
+          <span class="title-req-label">Same trial?</span>
+          <span>No — qualifying scores do not have to be earned at the same trial.</span>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- COMPONENT TITLES -->
+  <div>
+    <div class="section-head" style="margin-bottom:10px;">🐾 10.1.7–10.1.9 — Component Titles</div>
+    <p style="font-size:14px;color:var(--text2);line-height:1.6;margin-bottom:16px;">
+      Component titles are earned independently by progressing through all four levels (Novice → Open → Excellent → Master) in a single component. These are earned separately from the class titles above. A dog may not be entered at a component level for which they are not yet eligible. Qualifying scores can be from separate trials. All are suffix titles.
+    </p>
+    <div class="comp-title-grid">
+
+      <div class="title-card">
+        <div class="title-card-header" style="background:#fff8ee;border-bottom:1px solid #e8d0b0;">
+          <div class="title-code-badge">SDC</div>
+          <div>
+            <div class="title-name">Scent Detection Container</div>
+            <div class="title-sub">🐾 10.1.7</div>
+          </div>
+        </div>
+        <div class="title-card-body">
+          <div class="title-req-row">
+            <span class="title-req-label">Requirement</span>
+            <span>One (1) qualifying score at each level in the Container component: Novice + Open + Excellent + Master.</span>
+          </div>
+          <div class="title-req-row">
+            <span class="title-req-label">Order</span>
+            <span>Must be completed in order: Novice → Open → Excellent → Master.</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="title-card">
+        <div class="title-card-header" style="background:#f0f4f8;border-bottom:1px solid #b0c4d8;">
+          <div class="title-code-badge" style="color:#1a4a7a;">SDI</div>
+          <div>
+            <div class="title-name">Scent Detection Interior</div>
+            <div class="title-sub">🐾 10.1.8</div>
+          </div>
+        </div>
+        <div class="title-card-body">
+          <div class="title-req-row">
+            <span class="title-req-label">Requirement</span>
+            <span>One (1) qualifying score at each level in the Interior component: Novice + Open + Excellent + Master.</span>
+          </div>
+          <div class="title-req-row">
+            <span class="title-req-label">Order</span>
+            <span>Must be completed in order: Novice → Open → Excellent → Master.</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="title-card">
+        <div class="title-card-header" style="background:#f0f8f0;border-bottom:1px solid #b0d0b0;">
+          <div class="title-code-badge" style="color:#1e5c30;">SDX</div>
+          <div>
+            <div class="title-name">Scent Detection Exterior</div>
+            <div class="title-sub">🐾 10.1.9</div>
+          </div>
+        </div>
+        <div class="title-card-body">
+          <div class="title-req-row">
+            <span class="title-req-label">Requirement</span>
+            <span>One (1) qualifying score at each level in the Exterior component: Novice + Open + Excellent + Master.</span>
+          </div>
+          <div class="title-req-row">
+            <span class="title-req-label">Order</span>
+            <span>Must be completed in order: Novice → Open → Excellent → Master.</span>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="info-box" style="margin-top:14px;">
+      🐾 10.1.11 — Once a dog has qualified in a component at one class level, they may move to the same component at the next class level. Example: a dog that qualifies in Novice Containers may move to Open Containers.
+    </div>
+  </div>
+
+</div>
+
+<script>
+// ═══════════════════════════════════════════════════════════════
+// DATA — all specs confirmed from CKC rulebook
+// ═══════════════════════════════════════════════════════════════
+const CLASSES = {
+  instinct: {
+    name: 'Instinct', instinctOnly: true,
+    scents: ['Wintergreen'],
+    containers: {
+      numContainers: 5, containerType: 'Identical boxes',
+      arrangement: '1 row of 5 containers',
+      minDist: '30 cm (12 in) in all directions',
+      numHides: '1 (known)', timeLimit: '2 minutes',
+      distractions: 'None', requiredCalls: 'Alert only',
+      searchAreaM: '23–37 m²', searchAreaFt: '250–400 sq ft',
+      multiArea: false, callFinish: false, callFinishNote: null,
+      accessibility: 'Accessible only',
+      notes: [
+        'Five identical box containers laid out in one row on the floor.',
+        'Each box must be at least 30 cm (12 in) from any other box.',
+        'One of the containers holds the target odour of Wintergreen.',
+        'Handler must call "Alert" when the dog indicates the find. Time stops after the Alert.',
+        'Instinct class uses the Containers component only — no Interior or Exterior.',
+      ]
+    },
+    interior: null, exterior: null,
+  },
+  novice: {
+    name: 'Novice',
+    scents: ['Wintergreen'],
+    containers: {
+      numContainers: 10, containerType: 'Identical boxes',
+      arrangement: '2 rows of 5 containers',
+      minDist: '30 cm (12 in) between containers; 91 cm (36 in) between rows',
+      numHides: '1 (known)', timeLimit: '2 minutes',
+      distractions: 'None', requiredCalls: 'Alert only',
+      searchAreaM: '23–37 m²', searchAreaFt: '250–400 sq ft',
+      multiArea: false, callFinish: false,
+      accessibility: 'Accessible only',
+      notes: [
+        '10 identical box containers in two rows of 5.',
+        'One container holds the target odour of Wintergreen.',
+        'Handler calls "Alert" when dog indicates the find.',
+      ]
+    },
+    interior: {
+      numHides: '1 (known)', timeLimit: '3 minutes',
+      maxHideHeight: '61 cm (24 in)', scents: 'Wintergreen (W)',
+      distractions: 'None', requiredCalls: 'Alert only',
+      searchAreaM: '9.3–18.6 m²', searchAreaFt: '100–200 sq ft',
+      multiArea: false, numAreas: 1, callFinish: false,
+      accessibility: 'Accessible only',
+      notes: [
+        'Search takes place inside a room or rooms in a building.',
+        'A tent may be used if it is enclosed with four (4) walls — must be listed on the premium list.',
+        'Max hide height is 61 cm (24 in) from the floor.',
+        'The full room need not be used; if part is excluded, boundaries must be clearly marked.',
+        'No intentional distractions at this level.',
+      ]
+    },
+    exterior: {
+      numHides: '1 (known)', timeLimit: '4 minutes',
+      maxHideHeight: '61 cm (24 in)', scents: 'Wintergreen (W)',
+      distractions: 'None', requiredCalls: 'Alert only',
+      searchAreaM: '18.6–37 m²', searchAreaFt: '200–400 sq ft',
+      multiArea: false, callFinish: false,
+      accessibility: 'Accessible only',
+      notes: [
+        'Outdoor search in natural airflow — may be covered but must have no more than two walls.',
+        'Max hide height is 61 cm (24 in) from the ground.',
+        'No intentional distractions at this level.',
+        'Boundaries marked with coloured tape, flags, fencing, ring gates, or similar.',
+      ]
+    }
+  },
+  open: {
+    name: 'Open',
+    scents: ['Wintergreen', 'Pine'],
+    containers: {
+      numContainers: 15, containerType: 'Various size and type',
+      arrangement: '3 rows of 5 containers, circle, or "U" formation',
+      minDist: '30 cm (12 in) between containers; 91 cm (36 in) between rows',
+      numHides: '2 (known)', timeLimit: '2 minutes',
+      distractions: '1 Toy', requiredCalls: '2× Alert calls',
+      searchAreaM: '37–56 m²', searchAreaFt: '400–600 sq ft',
+      multiArea: false, callFinish: false,
+      accessibility: 'Accessible only',
+      notes: [
+        '15 containers of various sizes and types.',
+        '2 containers hold target odour — may be Wintergreen, Pine, or one of each.',
+        '1 toy distraction — must NOT be in the same container as the odour.',
+        'Handler calls "Alert" for each find. Time stops after the second Alert.',
+      ]
+    },
+    interior: {
+      numHides: '2 (known)', timeLimit: '3 minutes',
+      maxHideHeight: '91 cm (36 in)', scents: 'Wintergreen (W) and/or Pine (P)',
+      distractions: '1 Toy', requiredCalls: '2× Alert calls',
+      searchAreaM: '18.6–37 m²', searchAreaFt: '200–400 sq ft',
+      multiArea: false, callFinish: false,
+      accessibility: 'Accessible only',
+      notes: [
+        '2 known hides — Wintergreen and/or Pine.',
+        'Max hide height is 91 cm (36 in) from the floor.',
+        '1 toy distraction in the search area.',
+        'Handler calls "Alert" for each find; time stops after second Alert.',
+      ]
+    },
+    exterior: {
+      numHides: '2 (known)', timeLimit: '4 minutes',
+      maxHideHeight: '91 cm (36 in)', scents: 'Wintergreen (W) and/or Pine (P)',
+      distractions: '1 Toy', requiredCalls: '2× Alert calls',
+      searchAreaM: '37–74 m²', searchAreaFt: '400–800 sq ft',
+      multiArea: false, callFinish: false,
+      accessibility: 'Accessible only',
+      notes: [
+        '2 known hides — Wintergreen and/or Pine.',
+        'Max hide height is 91 cm (36 in) from the ground.',
+        '1 toy distraction in the search area.',
+        'Handler calls "Alert" for each find; time stops after second Alert.',
+      ]
+    }
+  },
+  excellent: {
+    name: 'Excellent',
+    scents: ['Wintergreen', 'Pine', 'Anise'],
+    containers: {
+      numContainers: 20, containerType: 'Various size and type',
+      arrangement: '4 rows of 5 containers, circle, or "U" formation',
+      minDist: '30 cm (12 in) between containers; 91 cm (36 in) between rows',
+      numHides: '3 (known)', timeLimit: '3 minutes',
+      distractions: '2 (Toy or Food)', requiredCalls: '3× Alert calls',
+      searchAreaM: '56–74 m²', searchAreaFt: '600–800 sq ft',
+      multiArea: false, callFinish: false,
+      accessibility: 'Accessible only',
+      notes: [
+        '20 containers of various sizes and types.',
+        '3 containers hold target odour — Wintergreen, Pine, and/or Anise.',
+        '2 toy or food distractions in the search area.',
+        'Handler calls "Alert" for each find. Time stops after the third Alert.',
+      ]
+    },
+    interior: {
+      numHides: '3 known total (split across 2 areas — distribution unknown to handler)',
+      timeLimit: '3 minutes per area',
+      maxHideHeight: '122 cm (48 in)', scents: 'Wintergreen (W) and/or Pine (P) and/or Anise (A)',
+      distractions: '2 (Toy or Food)', requiredCalls: '3× Alert total + "Finish" per area',
+      searchAreaM: '37–74 m² total (2 areas)', searchAreaFt: '400–800 sq ft total',
+      multiArea: true, numAreas: 2, callFinish: true,
+      accessibility: '1 hide may be inaccessible',
+      notes: [
+        '⚠ Two distinct search areas in one or more rooms. Each area is timed separately.',
+        'There are 3 hides in total between the two areas — handler knows the total is 3 but does NOT know the split (could be 2+1 or 1+2).',
+        'No blank areas — both areas have at least one hide.',
+        '2 toy or food distractions; 1 hide may be inaccessible.',
+        'Handler must call "Finish" to stop the clock for each area before moving to the next.',
+        'Max hide height is 122 cm (48 in) from the floor.',
+      ]
+    },
+    exterior: {
+      numHides: '3 (known; 1 may be inaccessible)', timeLimit: '5 minutes',
+      maxHideHeight: '122 cm (48 in)', scents: 'Wintergreen (W) and/or Pine (P) and/or Anise (A)',
+      distractions: '2 (Toy or Food)', requiredCalls: '3× Alert calls (stops clock after 3rd)',
+      searchAreaM: '74–139 m²', searchAreaFt: '800–1500 sq ft',
+      multiArea: false, callFinish: false,
+      accessibility: '1 hide may be inaccessible',
+      notes: [
+        '3 known hides — Wintergreen, Pine, and/or Anise.',
+        '1 of the 3 hides may be inaccessible.',
+        '2 toy or food distractions.',
+        'Time stops after the third Alert call.',
+        'Max hide height is 122 cm (48 in) from the ground.',
+      ]
+    }
+  },
+  master: {
+    name: 'Master',
+    scents: ['Wintergreen', 'Pine', 'Anise', 'Clove'],
+    containers: {
+      numContainers: 20, containerType: 'Various size and type',
+      arrangement: '4 rows of 5 containers, circle, or "U" formation',
+      minDist: '30 cm (12 in) between containers; 91 cm (36 in) between rows',
+      numHides: '1–3 (UNKNOWN number)', timeLimit: '3 minutes',
+      distractions: '3 (Toy, Food, or Human)', requiredCalls: 'Alert(s) + "Finish" or "Clear"',
+      searchAreaM: '56–74 m²', searchAreaFt: '600–800 sq ft',
+      multiArea: false, callFinish: true,
+      accessibility: 'All hides may be inaccessible',
+      notes: [
+        '⚠ Handler does NOT know the exact number of hides (1, 2, or 3).',
+        '3 distractions — may be toy, food, or human.',
+        'Handler calls "Alert" for each find.',
+        'Handler must call "Finish" or "Clear" when they believe all hides have been found — this STOPS the clock.',
+        'Failing to call Finish/Clear before time expires is a Non-Qualifying fault.',
+      ]
+    },
+    interior: {
+      numHides: '1–3 unknown (max 3 total across 2–3 areas; 1 area may be blank)',
+      timeLimit: '3 minutes per area',
+      maxHideHeight: '122 cm (48 in) — see note',
+      scents: 'Wintergreen (W), Pine (P), Anise (A), and/or Clove (CL)',
+      distractions: '3 (Toy, Food, or Human)', requiredCalls: 'Alert(s) + "Finish" or "Clear" per area',
+      searchAreaM: '56–93 m² total (2–3 areas)', searchAreaFt: '600–1000 sq ft total',
+      multiArea: true, numAreas: '2–3', callFinish: true,
+      accessibility: 'All hides may be inaccessible',
+      notes: [
+        '⚠ Handler does NOT know the exact number of hides (max 3 total across all areas).',
+        '⚠ 2 to 3 distinct search areas — each timed independently at 3 minutes per area.',
+        'One of the search areas may be blank (contain no hide).',
+        'Any or all hides may be inaccessible.',
+        '3 distractions — toy, food, or human.',
+        'Handler must call "Finish" or "Clear" to stop the clock for each area. The process repeats for each additional area.',
+        '⚑ Height discrepancy in rulebook: paragraph text states 122 cm (48 in); the summary table shows 152 cm (60 in). Verify against your copy.',
+      ]
+    },
+    exterior: {
+      numHides: '1–3 (UNKNOWN; all may be inaccessible)', timeLimit: '5 minutes',
+      maxHideHeight: '122 cm (48 in)', scents: 'Wintergreen (W), Pine (P), Anise (A), and/or Clove (CL)',
+      distractions: '3 (Toy, Food, or Human)', requiredCalls: 'Alert(s) + "Finish" or "Clear"',
+      searchAreaM: '139–186 m²', searchAreaFt: '1500–2000 sq ft',
+      multiArea: false, callFinish: true,
+      accessibility: 'All hides may be inaccessible',
+      notes: [
+        '⚠ Handler does NOT know the exact number of hides (1, 2, or 3).',
+        'Any or all hides may be inaccessible.',
+        '3 distractions — toy, food, or human.',
+        'Handler calls "Alert" for each find, then "Finish" or "Clear" when all hides are found.',
+        'Max hide height is 122 cm (48 in) from the ground.',
+      ]
+    }
+  }
+};
+
+const SCENT_PILLS = {
+  Wintergreen: `<span class="scent-pill pill-wg">Wintergreen (W)</span>`,
+  Pine:        `<span class="scent-pill pill-pine">Pine (P)</span>`,
+  Anise:       `<span class="scent-pill pill-anise">Anise (A)</span>`,
+  Clove:       `<span class="scent-pill pill-clove">Clove (CL)</span>`,
+};
+
+const SCENT_DETAILS = {
+  Wintergreen: { latin: 'Gaultharia procumbens',  code: 'W',  cls: 'pill-wg'    },
+  Pine:        { latin: 'Pinus sylvestris',        code: 'P',  cls: 'pill-pine'  },
+  Anise:       { latin: 'Pimpinella anisum',       code: 'A',  cls: 'pill-anise' },
+  Clove:       { latin: 'Eugenia caryophyllata',   code: 'CL', cls: 'pill-clove' },
+};
+
+const CLASS_COLORS = {
+  instinct: '#7a5c00', novice: '#1e5c30', open: '#1a4a7a', excellent: '#5a2a78', master: '#8a2020'
+};
+
+// ═══════════════════════════════════════════════════════════════
+// STATE
+// ═══════════════════════════════════════════════════════════════
+let state = { classKey: 'instinct', comp: 'containers' };
+
+// ═══════════════════════════════════════════════════════════════
+// TAB SWITCH
+// ═══════════════════════════════════════════════════════════════
+function switchTab(name) {
+  const tabs  = document.querySelectorAll('.tab');
+  const pages = ['rules','compare','faults','titles'];
+  tabs.forEach((t, i) => t.classList.toggle('active', pages[i] === name));
+  pages.forEach(p => {
+    document.getElementById('page-' + p).classList.toggle('active', p === name);
+  });
+}
+
+// ═══════════════════════════════════════════════════════════════
+// SELECTORS
+// ═══════════════════════════════════════════════════════════════
+function selectClass(key) {
+  state.classKey = key;
+  document.querySelectorAll('#class-btns .btn').forEach((b, i) => {
+    b.classList.toggle('active-class', ['instinct','novice','open','excellent','master'][i] === key);
+  });
+  if (key === 'instinct' && state.comp !== 'containers') {
+    selectComp('containers'); return;
+  }
+  renderRules();
+}
+
+function selectComp(comp) {
+  state.comp = comp;
+  document.querySelectorAll('#comp-btns .btn').forEach((b, i) => {
+    b.classList.toggle('active-comp', ['containers','interior','exterior'][i] === comp);
+  });
+  renderRules();
+}
+
+// ═══════════════════════════════════════════════════════════════
+// RENDER
+// ═══════════════════════════════════════════════════════════════
+function renderRules() {
+  const panel = document.getElementById('rules-panel');
+  const cls   = CLASSES[state.classKey];
+  const comp  = state.comp;
+  const data  = cls[comp];
+
+  if (cls.instinctOnly && comp !== 'containers') {
+    panel.innerHTML = `<div class="fade-in"><div class="note-box">
+      <strong>Instinct class uses the Containers component only.</strong>
+      Interior and Exterior components are available for Novice through Master.
+    </div></div>`;
+    return;
+  }
+
+  const scentsHTML = cls.scents.map(s => SCENT_PILLS[s]).join(' ');
+  const color = CLASS_COLORS[state.classKey];
+  const compLabel = { containers:'Containers', interior:'Interior', exterior:'Exterior' }[comp];
+  const isMaster  = state.classKey === 'master';
+  const isUnknown = isMaster || (state.classKey === 'excellent' && comp !== 'containers' && comp !== 'exterior');
+
+  const notesHTML = (data.notes || []).map(n => `
+    <div class="special-rule">
+      <span class="special-rule-icon">${n.startsWith('⚠')||n.startsWith('⚑') ? '' : '›'}</span>
+      <span>${n}</span>
+    </div>`).join('');
+
+  let compSpecific = '';
+  if (comp === 'containers') {
+    compSpecific = `
+      <div class="rule-row"><span class="rule-label"># Containers</span><span class="rule-val hl">${data.numContainers}</span></div>
+      <div class="rule-row"><span class="rule-label">Container Type</span><span class="rule-val">${data.containerType}</span></div>
+      <div class="rule-row"><span class="rule-label">Arrangement</span><span class="rule-val">${data.arrangement}</span></div>
+      <div class="rule-row"><span class="rule-label">Min. Distance</span><span class="rule-val">${data.minDist}</span></div>
+      <div class="rule-row"><span class="rule-label">Search Area</span><span class="rule-val">${data.searchAreaM} (${data.searchAreaFt})</span></div>`;
+  } else {
+    compSpecific = `
+      <div class="rule-row"><span class="rule-label">Max Hide Height</span><span class="rule-val hl">${data.maxHideHeight}</span></div>
+      <div class="rule-row"><span class="rule-label">Search Area</span><span class="rule-val">${data.searchAreaM} (${data.searchAreaFt})</span></div>
+      <div class="rule-row"><span class="rule-label">Search Areas</span><span class="rule-val">${data.multiArea ? `${data.numAreas} separate timed areas` : 'Single area'}</span></div>
+      <div class="rule-row"><span class="rule-label">Accessibility</span><span class="rule-val">${data.accessibility}</span></div>
+      <div class="rule-row"><span class="rule-label">Environment</span><span class="rule-val">${comp==='interior'?'Indoor — room, building, or 4-walled enclosed tent':'Outdoor — natural airflow; max 2 walls if covered'}</span></div>`;
+  }
+
+  panel.innerHTML = `
+  <div class="fade-in">
+    <div class="comp-header-strip" style="background:${color};">
+      <div>
+        <div class="ch-comp">${compLabel} Component</div>
+        <div class="ch-class">${cls.name}</div>
+      </div>
+      <div class="ch-spacer"></div>
+      <div style="text-align:right;display:flex;flex-direction:column;gap:5px;align-items:flex-end;">
+        <div class="ch-badge">${data.timeLimit}</div>
+        <div class="ch-badge">${data.numHides} hide${String(data.numHides).startsWith('1 (') ? '' : 's'}</div>
+        ${data.callFinish ? '<div class="ch-badge" style="background:rgba(255,80,40,0.25);border-color:rgba(255,150,100,0.6);">Finish / Clear required</div>' : ''}
+      </div>
+    </div>
+
+    <div class="rules-grid">
+
+      <div class="card">
+        <div class="card-header">
+          <div>
+            <div class="section-head">Core Specifications</div>
+            <div class="card-title">${cls.name} — ${compLabel}</div>
+          </div>
+        </div>
+        <div class="card-body">
+          <div class="rule-row"><span class="rule-label">Target Odour(s)</span><span class="rule-val">${scentsHTML}</span></div>
+          <div class="rule-row"><span class="rule-label">Number of Hides</span><span class="rule-val ${isUnknown?'warn':'hl'}">${data.numHides}</span></div>
+          <div class="rule-row"><span class="rule-label">Time Limit</span><span class="rule-val hl">${data.timeLimit}</span></div>
+          ${comp==='containers'?`<div class="rule-row"><span class="rule-label">Distractions</span><span class="rule-val ${data.distractions==='None'?'good':'warn'}">${data.distractions}</span></div>`:''}
+          ${comp!=='containers'?`<div class="rule-row"><span class="rule-label">Distractions</span><span class="rule-val ${data.distractions==='None'?'good':'warn'}">${data.distractions}</span></div>`:''}
+          <div class="rule-row"><span class="rule-label">Required Calls</span><span class="rule-val">${data.requiredCalls}</span></div>
+          ${compSpecific}
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-header">
+          <div>
+            <div class="section-head">Odours in Use</div>
+            <div class="card-title">Scent Details</div>
+            <div class="card-code">🐾 9.3.7</div>
+          </div>
+        </div>
+        <div class="card-body">
+          ${cls.scents.map(s => {
+            const d = SCENT_DETAILS[s];
+            return `<div class="rule-row">
+              <span class="rule-label"><span class="scent-pill ${d.cls}">${s} (${d.code})</span></span>
+              <span class="rule-val" style="font-style:italic;font-size:13px;">${d.latin}</span>
+            </div>`;
+          }).join('')}
+          <div class="info-box">1 drop essential oil → cotton ball or swab → sealed glass jar → 72–24 hrs before trial. Glass required for storage. Plastic vessels allowed in search; aids removed from plastic for storage.</div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-header">
+          <div><div class="section-head">Class Notes</div><div class="card-title">Special Rules</div></div>
+        </div>
+        <div class="card-body">
+          ${notesHTML || '<div style="color:var(--text3);font-size:13px;">No additional notes.</div>'}
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-header">
+          <div>
+            <div class="section-head">🐾 9.5.4 – 9.5.5</div>
+            <div class="card-title">Required Calls</div>
+          </div>
+        </div>
+        <div class="card-body">
+          <div class="rule-row">
+            <span class="rule-label">"Alert"</span>
+            <span class="rule-val">${{
+              instinct: 'Called once — stops the clock.',
+              novice:   'Called once — stops the clock.',
+              open:     'Called twice (once per hide). Stops clock after 2nd Alert.',
+              excellent: comp==='containers' ? 'Called three times (once per hide). Stops clock after 3rd Alert.' : 'Called for each hide found in the area.',
+              master:   'Called for each hide found. Does NOT stop the clock.'
+            }[state.classKey]}</span>
+          </div>
+          ${data.callFinish ? `
+          <div class="rule-row">
+            <span class="rule-label">"Finish" / "Clear"</span>
+            <span class="rule-val warn">Called when handler believes ALL hides in the area have been found. <strong>Stops the clock for that area.</strong> Required before time expires — failure is an NQ fault.</span>
+          </div>` : ''}
+          <div class="rule-row">
+            <span class="rule-label">Verbal alternative</span>
+            <span class="rule-val">If verbal Alert is not possible, inform the judge of an alternate confirmation (e.g. hand signal) before the search begins.</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="card full-width">
+        <div class="card-header">
+          <div><div class="section-head">🐾 9.5.13</div><div class="card-title">Qualifying Criteria</div></div>
+        </div>
+        <div class="card-body">
+          <div class="pass-box">
+            To qualify: correctly identify ${data.callFinish&&!isMaster?'all hides in each area':isMaster?'all hide(s) — exact number unknown':data.numHides} within ${data.timeLimit},
+            with no more than one (1) minor fault per search area. Any non-qualifying fault is an automatic NQ.
+            ${data.callFinish ? 'Handler must call "Finish" or "Clear" '+(data.multiArea?'for each area ':'')+'before time expires.' : ''}
+          </div>
+          <div class="info-box" style="margin-top:10px;">
+            🐾 10.1 — One (1) qualifying score in each of Containers, Interior, and Exterior at this class level earns the class title. Scores do not have to be from the same trial.
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>`;
+}
+
+// ═══════════════════════════════════════════════════════════════
+// INIT
+// ═══════════════════════════════════════════════════════════════
+renderRules();
+
+// ═══════════════════════════════════════════════════════════════
+// PWA — register an inline service worker for offline support
+// ═══════════════════════════════════════════════════════════════
+if ('serviceWorker' in navigator) {
+  const swCode = `
+    const CACHE = 'ckc-scent-v1';
+    self.addEventListener('install', e => {
+      e.waitUntil(caches.open(CACHE).then(c => c.addAll([self.registration.scope])));
+    });
+    self.addEventListener('fetch', e => {
+      e.respondWith(caches.match(e.request).then(r => r || fetch(e.request).catch(() => caches.match(e.request))));
+    });
+  `;
+  const blob = new Blob([swCode], {type:'application/javascript'});
+  const swUrl = URL.createObjectURL(blob);
+  navigator.serviceWorker.register(swUrl).catch(() => {});
+}
+</script>
+</body>
+</html>
